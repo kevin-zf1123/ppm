@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Based on Tabler Icons "file-text" (outline) v3.31.0, MIT License, Copyright (c) 2020-2024 Pawel Kuna. https://tabler.io/icons (left half). The branch arrows (right half) are original PPM artwork. -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64" height="64" viewBox="0 0 64 64">
+  <g transform="translate(0 16) scale(1.333)" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+    <path d="M9 9l1 0" />
+    <path d="M9 13l6 0" />
+    <path d="M9 17l6 0" />
+  </g>
+  <image x="32" y="0" width="32" height="64" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAABACAYAAAB7jnWuAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFxEAABcRAcom8z8AAAO/SURBVGhDxZlLqE1hHMUXdfMo8ookdBmIkRHKwIAJBh4xufKKGwORKAMij0Ld5JHyGHgmkRh4lAEGFKUoBuRNGFDklffVqrW177r/fe1zzr7bqpXb2d///1u+sx/f/g5QkJqbm/nPbP+8NCnAfQAT/FiZ2g3gHYDRClS6JnMyAHzgTPyPEMMAvFSIjwAWMkSZQToBOK8AiXcB6FpmkJUWgL4BYHgSouog6QZqsgrAagA7AZwAcAbAYQC/ghBfAKzgLFUcxMEqHBJA8vg6gFG5AzhYRWsBfA+a5/VPAKd4uTqvhRws+OmgYTX+DGCeM//KwYIfCxpVaoI3A+iZ+RU4WAMXBs3S/q0T7YGm2I/TVwCMsL654D0AfAsa0q8BLAcwWC2WBGO+AlgX9G0tH6SBnDJvSt8C0MtaHLQx99JnfSaYcrAG8+7Ge7vD32tm0hoA4E5qzDmO+Sc4kcNVNDOA05xq19jU8SYAdbnAiRyu4uMBnDNS5/U6F3h8TUVgysFqwOl/EwQ45PXSIwBbKoZTDleTMQGc5tfSqh7ANgAd/VguOVwNlwXwHwD6R/UAevvnueVwNYzufLz0ipfDFeB2EGCv19YsBwveT9PtARZ5fc1yuAJMDOA0r/Vi5XAF4DPf4bz7dfH6muVwBbgcBODTrFg5WPCeGSuejV5fsxyuAJsCON32EqpK7U+Zl9iBjFXtMy8sSg7KMtf77SIHReYzvoMXFiWHRb7mRUXKYVlu8MKidNYcXf90qQ+hI0EAmq/fxcrhCjAogNPtcyV4AIW4GQTgu3/xcrgCbA0CvM1YjNYmhyvA9CAAPdLra5bDFWCg3vc8QPvsBXoAhXgYBNjhtYXI4QrATQQPcNVrC5HDFYB7QB6Ar+D+QpqM7+yf55bD1XB8EIDmhmSrem1CVSeHq2E3bTh6gFbngcbznJmvvyuXB1AjPh88wCuvlTbo+KyqQjhcTRqDAPQMr9dOOY9xRdWY6pFPDlcxNyGiF5THXq+9w/Sl21RUCN92SXzS6/VZesxFPtxyB3G4ioYG8MSXAIxLLdmWBmOeAJhkPbPlAVTAdwJvnPYn/WLC/3G0qqb3AeibK4gH0GDu83rTSv0CwNxqA3QHcDdoWo35njHFuS3kARSCt9ujQcNK/RTANGeG8hAKwmJvmsfPAczhSdvmVxApCMEfJy7oFxF+Ndwl41WRdRLuAdDHehSuaGOLJ97U9gYn4k83aThnqL4MMFVvt+LtZYETpdcPi8uGU+sFbygbnIjTv+C/wAXlGrIi/QHoEltm1HoajgAAAABJRU5ErkJggg=="/>
+</svg>

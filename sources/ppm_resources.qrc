@@ -1,0 +1,44 @@
+<RCC>
+  <qresource prefix="/">
+    <file>Resources/xdts.svg</file>
+    <file>Resources/folder.svg</file>
+    <file>Resources/folder_colored.svg</file>
+	<file>Resources/log.svg</file>
+	<file>Resources/gear.svg</file>
+	<file>Resources/arrow_closed.png</file>
+	<file>Resources/arrow_opened.png</file>
+    <file>Resources/lock.png</file>
+    <file>Resources/lock_hover.png</file>
+    <file>Resources/unlock.png</file>
+    <file>Resources/unlock_hover.png</file>
+	<file>Resources/check_off.png</file>
+	<file>Resources/ppm64.png</file>
+	<file>Resources/copyFolder64.svg</file>
+	<file>Resources/renameFile64.svg</file>
+	<file>Resources/copyFile64.svg</file>
+	<file>Resources/moveFlow64.png</file>
+	<file>Resources/check_ok64.svg</file>
+	<file>Resources/check_ng64.svg</file>
+	<file>Resources/delete64.svg</file>
+	<file>Resources/undo64.png</file>
+	<file>Resources/warning64.png</file>
+	<file>Resources/warning.svg</file>
+	<file>Resources/swap.svg</file>
+	<file>Resources/cue64.svg</file>
+	<file>Resources/start_branch64.png</file>
+	<file>Resources/end_branch64.png</file>
+	<file>Resources/googleSheets64.png</file>
+	<file>Resources/setInfo64.svg</file>
+	<file>Resources/retake.svg</file>
+	<file>Resources/reload.png</file>
+	<file>Resources/reload_black.png</file>
+	<file>Resources/new-folder.svg</file>
+	<file>Resources/zip-folder.svg</file>
+	<file>Resources/googleChat64.png</file>
+	<file>Resources/rename_scripts/genga_to_uchikomi.js</file>
+	<file>Resources/branch_info64.svg</file>
+	<file>Resources/branch_file64.svg</file>
+	<file>Resources/search.svg</file>
+	<file>Resources/ppm_logo.svg</file>
+  </qresource>
+</RCC>

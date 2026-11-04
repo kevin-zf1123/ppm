@@ -1,0 +1,74 @@
+exchangeDigitalTimeSheet Save Data
+{
+    "timeTables": [
+        {
+            "duration": 3,
+            "fields": [
+                {
+                    "fieldId": 0,
+                    "tracks": [
+                        {
+                            "frames": [
+                                {
+                                    "data": [
+                                        {
+                                            "id": 0,
+                                            "values": [
+                                                "1"
+                                            ]
+                                        }
+                                    ],
+                                    "frame": 0
+                                },
+                                {
+                                    "data": [
+                                        {
+                                            "id": 0,
+                                            "values": [
+                                                "2"
+                                            ]
+                                        }
+                                    ],
+                                    "frame": 1
+                                },
+                                {
+                                    "data": [
+                                        {
+                                            "id": 0,
+                                            "values": [
+                                                "3"
+                                            ]
+                                        }
+                                    ],
+                                    "frame": 2
+                                },
+                                {
+                                    "data": [
+                                        {
+                                            "id": 0,
+                                            "values": [
+                                                "SYMBOL_NULL_CELL"
+                                            ]
+                                        }
+                                    ],
+                                    "frame": 3
+                                }
+                            ],
+                            "trackNo": 0
+                        }
+                    ]
+                }
+            ],
+            "name": "simple",
+            "timeTableHeaders": [
+                {
+                    "fieldId": 0,
+                    "names": [
+                        "A"
+                    ]
+                }
+            ]
+        }
+    ],
+    "version": 5
+}

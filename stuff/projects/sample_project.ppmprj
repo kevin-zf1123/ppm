@@ -1,0 +1,1852 @@
+{
+    "cutNumberPrefix": "c",
+    "description": "PPMサンプルプロジェクト",
+    "episodeNames": [
+    ],
+    "flowChartLayout": {
+        "groupNodes": [
+            {
+                "flowGroupId": 0,
+                "height": 222,
+                "width": 223.43294285431833,
+                "x": 86.47071407387759,
+                "y": -2.2799429531754924
+            },
+            {
+                "flowGroupId": 1,
+                "height": 222,
+                "width": 221.99999999999997,
+                "x": 89.33659978251424,
+                "y": 237.02151371799187
+            },
+            {
+                "flowGroupId": 2,
+                "height": 252,
+                "width": 223,
+                "x": 88.31147928857439,
+                "y": 474.5369858652898
+            },
+            {
+                "flowGroupId": 4,
+                "height": 192,
+                "width": 222,
+                "x": 89,
+                "y": 744
+            },
+            {
+                "flowGroupId": 5,
+                "height": 102,
+                "width": 222,
+                "x": 87.90365692819589,
+                "y": 954.9258837314939
+            },
+            {
+                "flowGroupId": 6,
+                "height": 279.22591423204904,
+                "width": 226.080888541604,
+                "x": 335.80277072527366,
+                "y": 181.13674239957544
+            },
+            {
+                "flowGroupId": 7,
+                "height": 270.7200570468242,
+                "width": 328.03777121955903,
+                "x": 337.23571357959173,
+                "y": 454.8288275743838
+            },
+            {
+                "flowGroupId": 8,
+                "height": 187.88477131841614,
+                "width": 339.501314054106,
+                "x": 334.36982787095525,
+                "y": 742.8503412923757
+            }
+        ],
+        "workflowNodes": [
+            {
+                "expanded": false,
+                "workflowTypeId": 0,
+                "x": 107.47071407387759,
+                "y": 48.72005704682451
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 1,
+                "x": 107.47071407387759,
+                "y": 78.72005704682451
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 2,
+                "x": 107.47071407387759,
+                "y": 108.72005704682451
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 3,
+                "x": 107.47071407387759,
+                "y": 138.7200570468245
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 4,
+                "x": 108.90365692819594,
+                "y": 168.7200570468245
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 5,
+                "x": 110.33659978251424,
+                "y": 288.02151371799187
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 6,
+                "x": 110.33659978251424,
+                "y": 318.02151371799187
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 7,
+                "x": 110.33659978251424,
+                "y": 348.02151371799187
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 8,
+                "x": 110.33659978251424,
+                "y": 378.02151371799187
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 9,
+                "x": 110.33659978251424,
+                "y": 408.02151371799187
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 10,
+                "x": 109.31147928857439,
+                "y": 525.5369858652898
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 11,
+                "x": 110.3114792885744,
+                "y": 555.5369858652898
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 12,
+                "x": 110.31147928857439,
+                "y": 585.5369858652898
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 13,
+                "x": 110.3114792885744,
+                "y": 615.5369858652898
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 14,
+                "x": 110.3114792885744,
+                "y": 645.5369858652898
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 15,
+                "x": 110.31147928857439,
+                "y": 675.5369858652898
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 16,
+                "x": 110,
+                "y": 795
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 17,
+                "x": 110,
+                "y": 825
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 18,
+                "x": 110,
+                "y": 855
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 19,
+                "x": 110,
+                "y": 885
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 20,
+                "x": 360.8836592668776,
+                "y": 232.13674239957544
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 21,
+                "x": 356.80277072527366,
+                "y": 289.3626566316245
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 22,
+                "x": 356.80277072527366,
+                "y": 319.3626566316245
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 23,
+                "x": 356.80277072527366,
+                "y": 349.3626566316245
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 24,
+                "x": 356.80277072527366,
+                "y": 379.3626566316245
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 25,
+                "x": 356.80277072527366,
+                "y": 409.3626566316245
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 26,
+                "x": 464.27348479915076,
+                "y": 505.8288275743838
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 27,
+                "x": 358.23571357959173,
+                "y": 554.548884621208
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 28,
+                "x": 358.23571357959173,
+                "y": 584.548884621208
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 29,
+                "x": 358.23571357959173,
+                "y": 614.548884621208
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 30,
+                "x": 358.23571357959173,
+                "y": 644.548884621208
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 31,
+                "x": 358.23571357959173,
+                "y": 674.548884621208
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 32,
+                "x": 472.87114192506124,
+                "y": 793.8503412923757
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 33,
+                "x": 355.36982787095525,
+                "y": 849.7351126107918
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 34,
+                "x": 355.36982787095525,
+                "y": 879.7351126107918
+            },
+            {
+                "expanded": false,
+                "workflowTypeId": 35,
+                "x": 108.90365692819589,
+                "y": 1005.9258837314939
+            }
+        ]
+    },
+    "flowGroupInfo": [
+        {
+            "flowGroupId": 0,
+            "idName": "LO",
+            "isRetakeGroup": false,
+            "isRetakeSourceGroup": false,
+            "labelName": "LO",
+            "standardCutFolderMacro": "[LO_CUTFOLDER]",
+            "subfolderForOpenButton": "",
+            "takeNotationStyle": 1,
+            "xdtsFileName": "[PREFIX][CUTNUMBER]_LO_ts.xdts"
+        },
+        {
+            "flowGroupId": 1,
+            "idName": "genga",
+            "isRetakeGroup": false,
+            "isRetakeSourceGroup": false,
+            "labelName": "原画",
+            "standardCutFolderMacro": "[GENGA_CUTFOLDER]",
+            "subfolderForOpenButton": "",
+            "takeNotationStyle": 1,
+            "xdtsFileName": "[PREFIX][CUTNUMBER]_genga_ts.xdts"
+        },
+        {
+            "flowGroupId": 2,
+            "idName": "douga",
+            "isRetakeGroup": false,
+            "isRetakeSourceGroup": false,
+            "labelName": "動画",
+            "standardCutFolderMacro": "[DOUGA_CUTFOLDER]",
+            "subfolderForOpenButton": "",
+            "takeNotationStyle": 1,
+            "xdtsFileName": "[PREFIX][CUTNUMBER]_[GENGA_OR_DOUGA]_ts.xdts"
+        },
+        {
+            "flowGroupId": 3,
+            "idName": "color",
+            "isRetakeGroup": false,
+            "isRetakeSourceGroup": false,
+            "labelName": "色彩設計",
+            "standardCutFolderMacro": "[COLOR_CUTFOLDER]",
+            "subfolderForOpenButton": "",
+            "takeNotationStyle": 1,
+            "xdtsFileName": "[PREFIX][CUTNUMBER]_[GENGA_OR_DOUGA]_ts.xdts"
+        },
+        {
+            "flowGroupId": 4,
+            "idName": "shiage",
+            "isRetakeGroup": false,
+            "isRetakeSourceGroup": false,
+            "labelName": "仕上",
+            "standardCutFolderMacro": "[SHIAGE_CUTFOLDER]",
+            "subfolderForOpenButton": "",
+            "takeNotationStyle": 1,
+            "xdtsFileName": "[PREFIX][CUTNUMBER]_[GENGA_OR_DOUGA]_ts.xdts"
+        },
+        {
+            "flowGroupId": 5,
+            "idName": "satsuei",
+            "isRetakeGroup": false,
+            "isRetakeSourceGroup": true,
+            "labelName": "撮影",
+            "standardCutFolderMacro": "[SATSUEI_CUTFOLDER]",
+            "subfolderForOpenButton": "",
+            "takeNotationStyle": 3,
+            "xdtsFileName": "[PREFIX][CUTNUMBER]_[GENGA_OR_DOUGA]_ts.xdts"
+        },
+        {
+            "flowGroupId": 6,
+            "idName": "genga_retake",
+            "isRetakeGroup": true,
+            "isRetakeSourceGroup": false,
+            "labelName": "原画リテイク",
+            "standardCutFolderMacro": "[GENGA_RETAKE_CUTFOLDER]",
+            "subfolderForOpenButton": "",
+            "takeNotationStyle": 2,
+            "xdtsFileName": "[PREFIX][CUTNUMBER]_genga_ts.xdts"
+        },
+        {
+            "flowGroupId": 7,
+            "idName": "douga_retake",
+            "isRetakeGroup": true,
+            "isRetakeSourceGroup": false,
+            "labelName": "動画リテイク",
+            "standardCutFolderMacro": "[DOUGA_RETAKE_CUTFOLDER]",
+            "subfolderForOpenButton": "",
+            "takeNotationStyle": 2,
+            "xdtsFileName": "[PREFIX][CUTNUMBER]_douga_ts.xdts"
+        },
+        {
+            "flowGroupId": 8,
+            "idName": "shiage_retake",
+            "isRetakeGroup": true,
+            "isRetakeSourceGroup": false,
+            "labelName": "仕上リテイク",
+            "standardCutFolderMacro": "[SHIAGE_RETAKE_CUTFOLDER]",
+            "subfolderForOpenButton": "",
+            "takeNotationStyle": 2,
+            "xdtsFileName": "[PREFIX][CUTNUMBER]_douga_ts.xdts"
+        }
+    ],
+    "gasUrl": "",
+    "gasUrlObfuscated": true,
+    "googleChatDestinations": [
+    ],
+    "hasEpisodes": false,
+    "logRootPath": "sample_data/PPM/log",
+    "pathMacros": [
+        {
+            "labelName": "[LOカットフォルダ]",
+            "macroStr": "[LO_CUTFOLDER]",
+            "path": "[ROOT]/01_LO_genga/[SEQUENCE]/[PREFIX][CUTNUMBER]/LO"
+        },
+        {
+            "labelName": "[原画カットフォルダ]",
+            "macroStr": "[GENGA_CUTFOLDER]",
+            "path": "[ROOT]/01_LO_genga/[SEQUENCE]/[PREFIX][CUTNUMBER]/genga"
+        },
+        {
+            "labelName": "[動画カットフォルダ]",
+            "macroStr": "[DOUGA_CUTFOLDER]",
+            "path": "[ROOT]/02_douga/[SEQUENCE]/[PREFIX][CUTNUMBER]"
+        },
+        {
+            "labelName": "[色彩設計カットフォルダ]",
+            "macroStr": "[COLOR_CUTFOLDER]",
+            "path": "[ROOT]/03_color/[SEQUENCE]/[PREFIX][CUTNUMBER]"
+        },
+        {
+            "labelName": "[仕上カットフォルダ]",
+            "macroStr": "[SHIAGE_CUTFOLDER]",
+            "path": "[ROOT]/04_shiage/[SEQUENCE]/[PREFIX][CUTNUMBER]"
+        },
+        {
+            "labelName": "[撮影カットフォルダ]",
+            "macroStr": "[SATSUEI_CUTFOLDER]",
+            "path": "[ROOT]/05_satsuei/[SEQUENCE]/[PREFIX][CUTNUMBER]"
+        },
+        {
+            "macroStr": "[GENGA_RETAKE_CUTFOLDER]",
+            "path": "[ROOT]/01_LO_genga/[SEQUENCE]/[PREFIX][CUTNUMBER][TAKE]/genga"
+        },
+        {
+            "macroStr": "[DOUGA_RETAKE_CUTFOLDER]",
+            "path": "[ROOT]/02_douga/[SEQUENCE]/[PREFIX][CUTNUMBER][TAKE]"
+        },
+        {
+            "macroStr": "[SHIAGE_RETAKE_CUTFOLDER]",
+            "path": "[ROOT]/04_shiage/[SEQUENCE]/[PREFIX][CUTNUMBER][TAKE]"
+        },
+        {
+            "macroStr": "[GENGA_PREV_EXISTING_TAKE_CUTFOLDER]",
+            "path": "[ROOT]/01_LO_genga/[SEQUENCE]/[PREFIX][CUTNUMBER][PREV_EXISTING_TAKE]/genga"
+        },
+        {
+            "macroStr": "[DOUGA_PREV_EXISTING_TAKE_CUTFOLDER]",
+            "path": "[ROOT]/02_douga/[SEQUENCE]/[PREFIX][CUTNUMBER][PREV_EXISTING_TAKE]"
+        },
+        {
+            "macroStr": "[SHIAGE_PREV_EXISTING_TAKE_CUTFOLDER]",
+            "path": "[ROOT]/04_shiage/[SEQUENCE]/[PREFIX][CUTNUMBER][PREV_EXISTING_TAKE]"
+        }
+    ],
+    "projectInfoFolderPath": "sample_data/PPM/info",
+    "projectRootPath": "sample_data",
+    "roles": [
+        {
+            "color": "#ffca9b",
+            "id": 0,
+            "labelName": "演出",
+            "suffix": "_e"
+        },
+        {
+            "color": "#bcbcfd",
+            "id": 1,
+            "labelName": "監督",
+            "suffix": "_k"
+        },
+        {
+            "color": "#b6fdd2",
+            "id": 2,
+            "labelName": "作監",
+            "suffix": "_s"
+        },
+        {
+            "color": "#fdfaba",
+            "id": 3,
+            "labelName": "演助",
+            "suffix": "_ej"
+        },
+        {
+            "color": "#86f3ff",
+            "id": 4,
+            "labelName": "制作",
+            "suffix": ""
+        }
+    ],
+    "sceneInfoTags": [
+        {
+            "canManuallySet": false,
+            "displayProperties": {
+                "bgColor": "#fb4c2f",
+                "labelTxt": "リテイク作業中",
+                "txtColor": "#ffffff"
+            },
+            "idName": "RETAKE_WIP",
+            "type": "String"
+        },
+        {
+            "canManuallySet": false,
+            "displayPropertiesMap": [
+                {
+                    "bgColor": "#fb4c2f",
+                    "labelTxt": "工程内リテイク：チェック中",
+                    "txtColor": "#ffffff",
+                    "valueName": "BackOnTrack"
+                },
+                {
+                    "bgColor": "#fb4c2f",
+                    "labelTxt": "工程内リテイク：作業中",
+                    "txtColor": "#ffffff",
+                    "valueName": "WIP"
+                }
+            ],
+            "idName": "REWIND",
+            "type": "Enum"
+        },
+        {
+            "canManuallySet": true,
+            "displayProperties": {
+                "bgColor": "#285aaa",
+                "labelTxt": "バンク",
+                "txtColor": "#f5f5fa"
+            },
+            "idName": "BANK",
+            "type": "StringList"
+        },
+        {
+            "canManuallySet": true,
+            "displayProperties": {
+                "bgColor": "#2da0be",
+                "labelTxt": "BG Only",
+                "txtColor": "#ffffff"
+            },
+            "idName": "BG_ONLY",
+            "type": "Bool"
+        }
+    ],
+    "sceneThumbnailPath": "",
+    "title": "sample_project",
+    "useSequence": true,
+    "workflows": [
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffca9b",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して監督に回す",
+                            "NextFlowTypeIds": [
+                                1
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[LO_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_LO_ej_s_k.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[LO_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_LO_ej_s_k_e.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_e",
+            "WorkflowGroupIdName": "LO",
+            "WorkflowName": "LO 演出チェック",
+            "WorkflowTypeId": 0
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#bcbcfd",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して作監に回す",
+                            "NextFlowTypeIds": [
+                                2
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[LO_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_LO_ej_s.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[LO_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_LO_ej_s_k.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_k",
+            "WorkflowGroupIdName": "LO",
+            "WorkflowName": "LO 監督チェック",
+            "WorkflowTypeId": 1
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#b6fdd2",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して演助に回す",
+                            "NextFlowTypeIds": [
+                                3
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[LO_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_LO_ej.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[LO_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_LO_ej_s.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_s",
+            "WorkflowGroupIdName": "LO",
+            "WorkflowName": "LO 作監チェック",
+            "WorkflowTypeId": 2
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#fdfaba",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認（LO上がり）",
+                            "NextFlowTypeIds": [
+                                4
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[LO_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_LO.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[LO_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_LO_ej.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_ej",
+            "WorkflowGroupIdName": "LO",
+            "WorkflowName": "LO 演助チェック",
+            "WorkflowTypeId": 3
+        },
+        {
+            "ClearsRewindOnComplete": true,
+            "Color": "#86f3ff",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "原画に移動",
+                            "NextFlowTypeIds": [
+                                5
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_CreateCueFile",
+                                    "ActionStepVariables": {
+                                        "FileContent": "原画作業後、CLIPファイルをこの名前にリネームすると演出チェックに送られます。",
+                                        "FileToBeCreated": "[GENGA_CUTFOLDER]/[PREFIX][CUTNUMBER]_genga_ej_s_k_e.txt"
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_MoveFlowGroup",
+                                    "ActionStepVariables": {
+                                        "MoveToFlowGroup": "genga"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[LO_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_LO.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "LO",
+            "WorkflowName": "LO上がり",
+            "WorkflowTypeId": 4
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffca9b",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して監督に回す",
+                            "NextFlowTypeIds": [
+                                6
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[GENGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_genga_ej_s_k.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[GENGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_genga_ej_s_k_e.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_e",
+            "WorkflowGroupIdName": "genga",
+            "WorkflowName": "原画 演出チェック",
+            "WorkflowTypeId": 5
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#bcbcfd",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して作監に回す",
+                            "NextFlowTypeIds": [
+                                7
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[GENGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_genga_ej_s.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[GENGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_genga_ej_s_k.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_k",
+            "WorkflowGroupIdName": "genga",
+            "WorkflowName": "原画 監督チェック",
+            "WorkflowTypeId": 6
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#b6fdd2",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して演助に回す",
+                            "NextFlowTypeIds": [
+                                8
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[GENGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_genga_ej.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[GENGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_genga_ej_s.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_s",
+            "WorkflowGroupIdName": "genga",
+            "WorkflowName": "原画 作監チェック",
+            "WorkflowTypeId": 7
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#fdfaba",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認（原画上がり）",
+                            "NextFlowTypeIds": [
+                                9
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[GENGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_genga.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[GENGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_genga_ej.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_ej",
+            "WorkflowGroupIdName": "genga",
+            "WorkflowName": "原画 演助チェック",
+            "WorkflowTypeId": 8
+        },
+        {
+            "ClearsRewindOnComplete": true,
+            "Color": "#86f3ff",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "動画に移動",
+                            "NextFlowTypeIds": [
+                                10
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Copy",
+                                    "ActionStepVariables": {
+                                        "CopyTo": [
+                                            "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER]_douga_ej_dk_ch_d_dm.clip"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_MoveFlowGroup",
+                                    "ActionStepVariables": {
+                                        "MoveToFlowGroup": "douga"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[GENGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_genga.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "genga",
+            "WorkflowName": "原画上がり",
+            "WorkflowTypeId": 9
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffd0fb",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "動画に回す",
+                            "NextFlowTypeIds": [
+                                11
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_douga_ej_dk_ch_d.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_douga_ej_dk_ch_d_dm.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_dm",
+            "WorkflowGroupIdName": "douga",
+            "WorkflowName": "動画出し前",
+            "WorkflowTypeId": 10
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffaeba",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "動画メインチェックに回す",
+                            "NextFlowTypeIds": [
+                                12
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_douga_ej_dk_ch.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_douga_ej_dk_ch_d.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_d",
+            "WorkflowGroupIdName": "douga",
+            "WorkflowName": "動画",
+            "WorkflowTypeId": 11
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#bcbcfd",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して動画検査に回す",
+                            "NextFlowTypeIds": [
+                                13
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_douga_ej_dk.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_douga_ej_dk_ch.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_ch",
+            "WorkflowGroupIdName": "douga",
+            "WorkflowName": "動画 メインチェック",
+            "WorkflowTypeId": 12
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffd0fb",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して演助に回す",
+                            "NextFlowTypeIds": [
+                                14
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_douga_ej.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_douga_ej_dk.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_dk",
+            "WorkflowGroupIdName": "douga",
+            "WorkflowName": "動画検査",
+            "WorkflowTypeId": 13
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#fdfaba",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認（動画上がり）",
+                            "NextFlowTypeIds": [
+                                15
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_douga.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_douga_ej.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_ej",
+            "WorkflowGroupIdName": "douga",
+            "WorkflowName": "動画 演助チェック",
+            "WorkflowTypeId": 14
+        },
+        {
+            "ClearsRewindOnComplete": true,
+            "Color": "#86f3ff",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "仕上に移動",
+                            "NextFlowTypeIds": [
+                                16
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_CreateCueFile",
+                                    "ActionStepVariables": {
+                                        "FileToBeCreated": "[SHIAGE_CUTFOLDER]/[PREFIX][CUTNUMBER]_c_k_p.txt"
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_MoveFlowGroup",
+                                    "ActionStepVariables": {
+                                        "MoveToFlowGroup": "shiage"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_douga.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "douga",
+            "WorkflowName": "動画上がり",
+            "WorkflowTypeId": 15
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffff7f",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "セル検へ回す",
+                            "NextFlowTypeIds": [
+                                17
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[SHIAGE_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_c_k.txt"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[SHIAGE_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_c_k_p.txt",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_p",
+            "WorkflowGroupIdName": "shiage",
+            "WorkflowName": "ペイント",
+            "WorkflowTypeId": 16
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffff7f",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "色指定へ回す",
+                            "NextFlowTypeIds": [
+                                18
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[SHIAGE_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_c.txt"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[SHIAGE_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_c_k.txt",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_k",
+            "WorkflowGroupIdName": "shiage",
+            "WorkflowName": "セル検",
+            "WorkflowTypeId": 17
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffff7f",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "完了（仕上上がり）",
+                            "NextFlowTypeIds": [
+                                19
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[SHIAGE_CUTFOLDER]/[PREFIX][CUTNUMBER][R].txt"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[SHIAGE_CUTFOLDER]/[PREFIX][CUTNUMBER][R]_c.txt",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_c",
+            "WorkflowGroupIdName": "shiage",
+            "WorkflowName": "色指定",
+            "WorkflowTypeId": 18
+        },
+        {
+            "ClearsRewindOnComplete": true,
+            "Color": "#86f3ff",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "撮出しへ送る",
+                            "NextFlowTypeIds": [
+                                35
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_CreateCueFile",
+                                    "ActionStepVariables": {
+                                        "FileToBeCreated": "[SATSUEI_CUTFOLDER]/[PREFIX][CUTNUMBER]_cue_check.txt"
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_AskDelete",
+                                    "ActionStepVariables": {
+                                        "DeleteDefault": true
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_MoveFlowGroup",
+                                    "ActionStepVariables": {
+                                        "MoveToFlowGroup": "satsuei"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[SHIAGE_CUTFOLDER]/[PREFIX][CUTNUMBER][R].txt",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "shiage",
+            "WorkflowName": "仕上上がり",
+            "WorkflowTypeId": 19
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#d1d1d1",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "完了",
+                            "NextFlowTypeIds": [
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_AskDelete",
+                                    "ActionStepVariables": {
+                                        "DeleteDefault": true
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[SATSUEI_CUTFOLDER]/[PREFIX][CUTNUMBER]_cue_check.txt",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "satsuei",
+            "WorkflowName": "撮出しチェック",
+            "WorkflowTypeId": 35
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#86f3ff",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "前テイク素材をコピーする",
+                            "NextFlowTypeIds": [
+                                21
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_CreateCueFile",
+                                    "ActionStepVariables": {
+                                        "FileContent": "原画リテイク作業後にCLIPファイルをこの名前にすると、演出チェック工程にファイルが並びます。",
+                                        "FileToBeCreated": "[GENGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_genga_ej_s_k_e.txt"
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_AskDelete",
+                                    "ActionStepVariables": {
+                                        "DeleteDefault": true
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_CopyFolderContents",
+                                    "ActionStepVariables": {
+                                        "From": "[GENGA_PREV_EXISTING_TAKE_CUTFOLDER]",
+                                        "Mode": "[SELECT][FOLDER_DEPTH=2]",
+                                        "To": [
+                                            "[GENGA_RETAKE_CUTFOLDER]/[TAKE-1]"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_CopyFolderContents",
+                                    "ActionStepVariables": {
+                                        "From": "[SATSUEI_CUTFOLDER]/sheet",
+                                        "Mode": "[ALL_WITHOUT_UI]",
+                                        "To": [
+                                            "[GENGA_RETAKE_CUTFOLDER]"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[GENGA_RETAKE_CUTFOLDER]/retake_start.txt",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "genga_retake",
+            "WorkflowName": "原画リテイク受付",
+            "WorkflowTypeId": 20
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffca9b",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して監督に回す",
+                            "NextFlowTypeIds": [
+                                22
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[GENGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_genga_ej_s_k.clip"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_SetSceneInfo",
+                                    "ActionStepVariables": {
+                                        "InfoName": "RETAKE_WIP",
+                                        "Value": ""
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[GENGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_genga_ej_s_k_e.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_e",
+            "WorkflowGroupIdName": "genga_retake",
+            "WorkflowName": "原画リテイク 演出チェック",
+            "WorkflowTypeId": 21
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#bcbcfd",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して作監に回す",
+                            "NextFlowTypeIds": [
+                                23
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[GENGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_genga_ej_s.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[GENGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_genga_ej_s_k.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_k",
+            "WorkflowGroupIdName": "genga_retake",
+            "WorkflowName": "原画リテイク 監督チェック",
+            "WorkflowTypeId": 22
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#b6fdd2",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して演助に回す",
+                            "NextFlowTypeIds": [
+                                24
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[GENGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_genga_ej.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[GENGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_genga_ej_s.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_s",
+            "WorkflowGroupIdName": "genga_retake",
+            "WorkflowName": "原画リテイク 作監チェック",
+            "WorkflowTypeId": 23
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#fdfaba",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認（原画リテイク上がり）",
+                            "NextFlowTypeIds": [
+                                25
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[GENGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_genga.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[GENGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_genga_ej.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_ej",
+            "WorkflowGroupIdName": "genga_retake",
+            "WorkflowName": "原画リテイク 演助チェック",
+            "WorkflowTypeId": 24
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#86f3ff",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "動画リテイクへ移動",
+                            "NextFlowTypeIds": [
+                                27
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[DOUGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_douga_ej_dk_ch_d.clip"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_MoveFlowGroup",
+                                    "ActionStepVariables": {
+                                        "MoveToFlowGroup": "douga_retake"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[GENGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_genga.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "genga_retake",
+            "WorkflowName": "原画リテイク上がり",
+            "WorkflowTypeId": 25
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#86f3ff",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "前テイク素材をコピーして動画リテイクへ",
+                            "NextFlowTypeIds": [
+                                27
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_CreateCueFile",
+                                    "ActionStepVariables": {
+                                        "FileContent": "CLIPファイルをこの名前にすると、動画リテイクにカットが並びます",
+                                        "FileToBeCreated": "[DOUGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_douga_ej_dk_ch_d.txt"
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_AskDelete",
+                                    "ActionStepVariables": {
+                                        "DeleteDefault": true
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_CopyFolderContents",
+                                    "ActionStepVariables": {
+                                        "From": "[DOUGA_PREV_EXISTING_TAKE_CUTFOLDER]",
+                                        "Mode": "[SELECT][FOLDER_DEPTH=2]",
+                                        "To": [
+                                            "[DOUGA_RETAKE_CUTFOLDER]/[TAKE-1]"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_CopyFolderContents",
+                                    "ActionStepVariables": {
+                                        "From": "[SHIAGE_PREV_EXISTING_TAKE_CUTFOLDER]",
+                                        "Mode": "[ALL]",
+                                        "To": [
+                                            "[DOUGA_RETAKE_CUTFOLDER]/[TAKE-1]"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_CopyFolderContents",
+                                    "ActionStepVariables": {
+                                        "From": "[SATSUEI_CUTFOLDER]/sheet",
+                                        "Mode": "[ALL_WITHOUT_UI]",
+                                        "To": [
+                                            "[DOUGA_RETAKE_CUTFOLDER]"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_RETAKE_CUTFOLDER]/retake_start.txt",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "douga_retake",
+            "WorkflowName": "動画リテイク受付",
+            "WorkflowTypeId": 26
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffaeba",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "動画メインチェックに回す",
+                            "NextFlowTypeIds": [
+                                28
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[DOUGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_douga_ej_dk_ch.clip"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_SetSceneInfo",
+                                    "ActionStepVariables": {
+                                        "InfoName": "RETAKE_WIP",
+                                        "Value": ""
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_douga_ej_dk_ch_d.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_d",
+            "WorkflowGroupIdName": "douga_retake",
+            "WorkflowName": "動画リテイク",
+            "WorkflowTypeId": 27
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#bcbcfd",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して動画検査に回す",
+                            "NextFlowTypeIds": [
+                                29
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[DOUGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_douga_ej_dk.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_douga_ej_dk_ch.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_ch",
+            "WorkflowGroupIdName": "douga_retake",
+            "WorkflowName": "動画リテイク メインチェック",
+            "WorkflowTypeId": 28
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffd0fb",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認して演助に回す",
+                            "NextFlowTypeIds": [
+                                30
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[DOUGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_douga_ej.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_douga_ej_dk.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_dk",
+            "WorkflowGroupIdName": "douga_retake",
+            "WorkflowName": "動画リテイク 動画検査",
+            "WorkflowTypeId": 29
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#fdfaba",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "承認（動画リテイク上がり）",
+                            "NextFlowTypeIds": [
+                                31
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[DOUGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_douga.clip"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_douga_ej.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "_ej",
+            "WorkflowGroupIdName": "douga_retake",
+            "WorkflowName": "動画リテイク 演助チェック",
+            "WorkflowTypeId": 30
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#86f3ff",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "仕上リテイクに移動",
+                            "NextFlowTypeIds": [
+                                33
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_CopyFolderContents",
+                                    "ActionStepVariables": {
+                                        "From": "",
+                                        "Mode": "[SELECT][FOLDER_DEPTH=2]",
+                                        "To": [
+                                            "[SHIAGE_RETAKE_CUTFOLDER]"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_CreateCueFile",
+                                    "ActionStepVariables": {
+                                        "FileToBeCreated": "[SHIAGE_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER]_k.txt"
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_MoveFlowGroup",
+                                    "ActionStepVariables": {
+                                        "MoveToFlowGroup": "shiage_retake"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[DOUGA_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER][TAKE]_douga.clip",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "douga_retake",
+            "WorkflowName": "動画リテイク上がり",
+            "WorkflowTypeId": 31
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#86f3ff",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "前テイク素材をコピーする",
+                            "NextFlowTypeIds": [
+                                33
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[SHIAGE_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER]_k.txt"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_CopyFolderContents",
+                                    "ActionStepVariables": {
+                                        "From": "[SHIAGE_PREV_EXISTING_TAKE_CUTFOLDER]",
+                                        "Mode": "[SELECT][FOLDER_DEPTH=2]",
+                                        "To": [
+                                            "[SHIAGE_RETAKE_CUTFOLDER]"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_CopyFolderContents",
+                                    "ActionStepVariables": {
+                                        "From": "[SATSUEI_CUTFOLDER]/sheet",
+                                        "Mode": "[ALL_WITHOUT_UI]",
+                                        "To": [
+                                            "[SHIAGE_RETAKE_CUTFOLDER]/_sheet"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[SHIAGE_RETAKE_CUTFOLDER]/retake_start.txt",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "shiage_retake",
+            "WorkflowName": "仕上リテイク受付",
+            "WorkflowTypeId": 32
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#ffff7f",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "完了 （仕上リテイク上がり）",
+                            "NextFlowTypeIds": [
+                                34
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_Rename",
+                                    "ActionStepVariables": {
+                                        "RenameTo": [
+                                            "[SHIAGE_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER].txt"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_SetSceneInfo",
+                                    "ActionStepVariables": {
+                                        "InfoName": "RETAKE_WIP",
+                                        "Value": ""
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[SHIAGE_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER]_k.txt",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "shiage_retake",
+            "WorkflowName": "仕上リテイク検査",
+            "WorkflowTypeId": 33
+        },
+        {
+            "ClearsRewindOnComplete": false,
+            "Color": "#86f3ff",
+            "Protocols": [
+                {
+                    "Actions": [
+                        {
+                            "ActionName": "撮出しへ送る",
+                            "NextFlowTypeIds": [
+                                35
+                            ],
+                            "Steps": [
+                                {
+                                    "ActionStepType": "Step_CopyFolderContents",
+                                    "ActionStepVariables": {
+                                        "From": "",
+                                        "Mode": "[SELECT][RENAME_T2R][FOLDER_DEPTH=2]",
+                                        "To": [
+                                            "[SATSUEI_CUTFOLDER]/paint[R_TAKE]"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_CreateCueFile",
+                                    "ActionStepVariables": {
+                                        "FileToBeCreated": "[SATSUEI_CUTFOLDER]/[PREFIX][CUTNUMBER]_cue_check.txt"
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_AskDelete",
+                                    "ActionStepVariables": {
+                                        "DeleteDefault": true
+                                    }
+                                },
+                                {
+                                    "ActionStepType": "Step_MoveFlowGroup",
+                                    "ActionStepVariables": {
+                                        "MoveToFlowGroup": "satsuei"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "ConditionPath": "[SHIAGE_RETAKE_CUTFOLDER]/[PREFIX][CUTNUMBER].txt",
+                    "MediaType": "Digital"
+                }
+            ],
+            "Suffix": "",
+            "WorkflowGroupIdName": "shiage_retake",
+            "WorkflowName": "仕上リテイク上がり",
+            "WorkflowTypeId": 34
+        }
+    ]
+}
