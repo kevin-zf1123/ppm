@@ -18,7 +18,6 @@ If you do not set the path of an application in PPM, the file is opened with the
 ## Contents of the distribution
 
 <!-- To be confirmed: once the distribution format (e.g. a ZIP on GitHub Releases) is decided, add the download link and the file name -->
-<!-- The manual is also distributed, so include it in the file structure. HTML version? -->
 
 When you extract the distributed ZIP file, you get the following structure.
 
@@ -26,6 +25,7 @@ When you extract the distributed ZIP file, you get the following structure.
 PPM/
 ├─ ppm.exe             … PPM itself
 ├─ conf.ini            … Settings file that specifies the location of the Stuff folder
+├─ README.txt          … Read-me file (with links to the manual, and so on)
 ├─ Qt6Core.dll, etc.   … Libraries required to run PPM (Qt)
 ├─ platforms/, etc.    … Same as above
 └─ stuff/              … The Stuff folder (projects, translation files, and so on)
