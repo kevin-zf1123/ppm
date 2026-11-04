@@ -35,17 +35,17 @@ When paths such as the root folder are written as relative paths in the project 
 
 ## Specifying the folder in conf.ini
 
-When PPM starts, it reads `conf.ini` in the same folder as `ppm.exe` to find the Stuff folder.
+When PPM starts, it reads `conf.ini` beside `ppm.exe` on Windows or beside `ppm.app` on macOS to find the Stuff folder. The relative path starts at that configuration folder. See [Installation](../getting-started/installation.md#macos-app-layout) for macOS shared-folder paths.
 
 ```ini
 [General]
 StuffFolderPath=//fileserver/anime/PPM/stuff
 ```
 
-- A relative path is relative to the folder of `ppm.exe`. The `conf.ini` in the distribution has `StuffFolderPath=stuff`, which points to the `stuff` folder next to `ppm.exe`.
+- On Windows, a relative path is relative to the folder of `ppm.exe`. The `conf.ini` in the distribution has `StuffFolderPath=stuff`, which points to the `stuff` folder next to `ppm.exe`.
 - Use slashes (`/`) as path separators. If you use backslashes (`\`), you must write two of them, like `\\` (see [Installation](../getting-started/installation.md)).
 - If there is no `conf.ini`, or `StuffFolderPath` is empty, PPM cannot find the Stuff folder and cannot open projects.
-- There is one `conf.ini` for each `ppm.exe`. If everyone uses one `ppm.exe` in a shared folder, `conf.ini` is also shared by everyone.
+- On Windows, there is one `conf.ini` for each `ppm.exe`. If everyone uses one `ppm.exe` in a shared folder, `conf.ini` is also shared by everyone.
 
 After changing the Stuff folder, restart PPM to apply the change.
 
@@ -73,7 +73,7 @@ XdtsViewerBinaryPath=
 | `OpenToonzArgument` | **OpenToonz arguments** |
 | `XdtsViewerBinaryPath` | **XDTS application path** |
 
-- Keys that are not written, and empty keys, keep the default of Preferences (empty). However, if `LanguageCode` is not written, the display language of Windows is used (English if there is no translation file for that language).
+- Keys that are not written, and empty keys, keep the default of Preferences (empty). However, if `LanguageCode` is not written, the display language of the OS is used (English if there is no translation file for that language).
 - The **User Name [USER_NAME]** cannot be given an initial value.
 - Use slashes (`/`) as path separators. Backslashes are treated the same way as in `conf.ini`.
 - The path above is an example. Check the actual installation location.

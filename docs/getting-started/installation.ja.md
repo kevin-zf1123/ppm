@@ -2,20 +2,20 @@
 
 # インストール
 
-PPM はインストーラーを使いません。配布されている ZIP ファイルを展開し、中の `ppm.exe` を起動するだけで使えます。
+PPM はインストーラーを使いません。Windows では配布 ZIP を展開し、`ppm.exe` を起動します。macOS では下記の配置と [ビルド手順](../about/contributing.ja.md#macos-でビルドして動かす) を参照してください。
 
 ## 動作環境
 
 | 項目 | 内容 |
 |---|---|
-| OS | Windows 10 / 11（64ビット） |
+| OS | Windows 10 / 11（64ビット）、またはビルドに使った Qt とアーキテクチャに対応する macOS |
 | ネットワーク | カットのファイルを置いた共有フォルダ（ファイルサーバーや NAS）に、各 PC からアクセスできること |
 | 作業用のアプリ（任意） | CLIP STUDIO PAINT、TVPaint Animation、OpenToonz、XDTS を開けるタイムシートアプリなど。PPM の一覧から各カットのファイルを開くときに使います |
 
 PPM 自体は、作業用のアプリがなくても動きます。
 作業用のアプリのパスを PPM に設定しなかった場合は、ファイルの拡張子に関連付けられたアプリで開きます（[初回設定](initial-setup.ja.md) を参照）。
 
-## 配布物の構成
+## Windows の配布物の構成
 
 <!-- 要確認：配布形式（GitHub Releases の ZIP など）が決まったら、ダウンロード先へのリンクとファイル名を書く -->
 
@@ -46,17 +46,34 @@ PPM/
 ユーザーごとの設定（[初回設定](initial-setup.ja.md) で行う内容）も消したいときは、
 `%LOCALAPPDATA%\PPM\usersettings.ini` も削除してください。
 
+## macOS のアプリの配置
+
+次の項目を同じ書き込み可能なフォルダに置き、`ppm.app` を開きます。
+
+```text
+PPM/
+├─ ppm.app
+├─ conf.ini
+└─ stuff/
+```
+
+`conf.ini` と Stuff はアプリの外に置きます。`StuffFolderPath=stuff` の場合、起動時の作業フォルダに関係なく、`ppm.app` のあるフォルダを起点に解決します。アプリだけを移動しても、設定や制作データは移りません。環境設定は `~/Library/Preferences/PPM/usersettings.ini` に保存されます。このファイルを削除するとユーザーごとの設定も消えます。
+
+SMB の共有フォルダは、プロジェクトを開く前に Finder でマウントし、`/Volumes/Production/PPM/stuff` などのローカルパスで指定してください。Windows のドライブ文字や UNC パスは自動変換されません。Windows と Mac で共有するプロジェクトは、できるだけ Stuff 起点の相対パスを使い、PC ごとに異なるアプリのパスは環境設定で指定します。プロジェクトファイルとログの形式は共通です。
+
+macOS の **フォルダのZIP圧縮** はシステムの圧縮ツールを使います。ドットで始まるファイルを含む対象フォルダの内容を格納し、macOS のリソースフォークは追加しません。ZIP の保存先は対象フォルダの外にしてください。取り消すと Windows と同様に ZIP を削除します。
+
 ## conf.ini と Stuff フォルダ
 
 **Stuff フォルダ**は、PPM が使うプロジェクトファイル・翻訳ファイル・リネームスクリプトなどをまとめたフォルダです。
-PPM は起動時に、`ppm.exe` と同じフォルダにある `conf.ini` を読んで、Stuff フォルダの場所を知ります。
+PPM は起動時に、Windows では `ppm.exe`、macOS では `ppm.app` と同じフォルダの `conf.ini` を読んで Stuff フォルダを探します。
 
 ```ini
 [General]
 StuffFolderPath=stuff
 ```
 
-- 相対パスを書いた場合は、`ppm.exe` のあるフォルダを起点とします。上の例では、`ppm.exe` の隣にある `stuff` フォルダが Stuff フォルダになります。
+- 相対パスは `conf.ini` のあるフォルダを起点とします。上の例では、その隣の `stuff` フォルダを使います。
 - 共有フォルダに置いた Stuff フォルダを指定することもできます。
   スタジオの全員が同じ Stuff フォルダを見るようにすると、プロジェクトの設定を一か所で管理できます。
   この場合は、パスの区切りにスラッシュ（`/`）を使うのが簡単です（例：`StuffFolderPath=//fileserver/anime/PPM/stuff`）。

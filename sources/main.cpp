@@ -17,7 +17,10 @@
 //-----------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
-  qputenv("QT_QPA_PLATFORM", "windows:darkmode=0");
+#ifdef Q_OS_WIN
+  if (!qEnvironmentVariableIsSet("QT_QPA_PLATFORM"))
+    qputenv("QT_QPA_PLATFORM", "windows:darkmode=0");
+#endif
 
   QApplication a(argc, argv);
   a.setApplicationName("PPM");

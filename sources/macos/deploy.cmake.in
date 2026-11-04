@@ -1,0 +1,148 @@
+set(source_bundle "$<TARGET_BUNDLE_DIR:ppm>")
+set(destination "@CMAKE_CURRENT_BINARY_DIR@/macos")
+set(bundle "${destination}/ppm.app")
+
+file(REAL_PATH "${source_bundle}" source_real)
+file(REAL_PATH "${bundle}" destination_real)
+if(source_real STREQUAL destination_real)
+    message(FATAL_ERROR "The build output must be separate from the deployment directory")
+endif()
+
+# Deploy into a fresh staging bundle. Never rewrite the build's link output:
+# rebuilding or re-deploying must not reuse frameworks from an older Qt.
+file(REMOVE_RECURSE "${bundle}")
+file(MAKE_DIRECTORY "${destination}")
+file(COPY "${source_bundle}" DESTINATION "${destination}")
+set(plugins
+@PPM_MACOS_PLUGINS@)
+
+# Resolve transitive libraries before copying them: package-manager dylibs can
+# use @rpath entries relative to their original location (for example Brotli).
+file(GET_RUNTIME_DEPENDENCIES
+     EXECUTABLES "$<TARGET_FILE:ppm>"
+     BUNDLE_EXECUTABLE "$<TARGET_FILE:ppm>"
+     MODULES ${plugins}
+     RESOLVED_DEPENDENCIES_VAR dependencies
+     UNRESOLVED_DEPENDENCIES_VAR missing
+     PRE_EXCLUDE_REGEXES "^/System/Library/" "^/usr/lib/")
+if(missing)
+    message(FATAL_ERROR "Unresolved runtime dependencies: ${missing}")
+endif()
+set(staged_plugins "")
+set(staged_dylibs "")
+set(deploy_arguments "-libpath=$<TARGET_FILE_DIR:Qt6::Core>/../../..")
+foreach(dependency IN LISTS dependencies)
+    get_filename_component(dependency "${dependency}" ABSOLUTE)
+    get_filename_component(directory "${dependency}" DIRECTORY)
+    list(APPEND deploy_arguments "-libpath=${directory}")
+    if(dependency MATCHES "^(.*\\.framework)/(.*)$")
+        set(framework "${CMAKE_MATCH_1}")
+        set(binary "${CMAKE_MATCH_2}")
+        get_filename_component(name "${framework}" NAME)
+        file(COPY "${framework}" DESTINATION "${bundle}/Contents/Frameworks")
+        file(CHMOD "${bundle}/Contents/Frameworks/${name}/${binary}"
+             PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+        list(APPEND deploy_arguments
+             "-executable=${bundle}/Contents/Frameworks/${name}/${binary}")
+    elseif(dependency MATCHES "\\.dylib$")
+        get_filename_component(filename "${dependency}" NAME)
+        file(MAKE_DIRECTORY "${bundle}/Contents/Frameworks")
+        file(COPY_FILE "${dependency}" "${bundle}/Contents/Frameworks/${filename}")
+        list(APPEND staged_dylibs "${bundle}/Contents/Frameworks/${filename}")
+        file(CHMOD "${bundle}/Contents/Frameworks/${filename}"
+             PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+    endif()
+endforeach()
+list(REMOVE_DUPLICATES deploy_arguments)
+
+# This directory contains only deployment output, not user data.
+file(REMOVE_RECURSE "${bundle}/Contents/PlugIns")
+foreach(plugin IN LISTS plugins)
+    get_filename_component(directory "${plugin}" DIRECTORY)
+    get_filename_component(category "${directory}" NAME)
+    file(COPY "${plugin}" DESTINATION "${bundle}/Contents/PlugIns/${category}")
+    get_filename_component(filename "${plugin}" NAME)
+    list(APPEND staged_plugins "${bundle}/Contents/PlugIns/${category}/${filename}")
+endforeach()
+
+execute_process(
+    COMMAND "$<TARGET_FILE:Qt6::macdeployqt>" "${bundle}"
+            -no-plugins -always-overwrite
+            ${deploy_arguments}
+    RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE errors
+)
+if(NOT result EQUAL 0 OR "${output}${errors}" MATCHES "ERROR:")
+    message(FATAL_ERROR "macdeployqt failed: ${output}${errors}")
+endif()
+
+file(MAKE_DIRECTORY "${bundle}/Contents/Resources")
+file(WRITE "${bundle}/Contents/Resources/qt.conf"
+     "[Paths]\nPlugins = PlugIns\n")
+
+# Plugin and package-manager rpaths describe their original directory layout.
+# Give each deployed loader a direct path to its bundled dependencies.
+function(add_runtime_path binary path)
+    execute_process(COMMAND /usr/bin/otool -l "${binary}"
+                    RESULT_VARIABLE result OUTPUT_VARIABLE commands ERROR_VARIABLE errors)
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Cannot inspect ${binary}: ${errors}")
+    endif()
+    string(FIND "${commands}" "path ${path} (offset" position)
+    if(position EQUAL -1)
+        execute_process(COMMAND /usr/bin/install_name_tool -add_rpath "${path}" "${binary}"
+                        RESULT_VARIABLE result ERROR_VARIABLE errors)
+        if(NOT result EQUAL 0)
+            message(FATAL_ERROR "Cannot set rpath for ${binary}: ${errors}")
+        endif()
+    endif()
+endfunction()
+foreach(plugin IN LISTS staged_plugins)
+    add_runtime_path("${plugin}" "@loader_path/../../Frameworks")
+endforeach()
+foreach(library IN LISTS staged_dylibs)
+    add_runtime_path("${library}" "@loader_path")
+endforeach()
+
+# Check the complete load graph. Do not let a local Qt installation mask a
+# missing bundled framework. Canonicalize duplicate lexical paths reported by
+# the loader's different @rpath chains before treating them as conflicts.
+file(GET_RUNTIME_DEPENDENCIES
+     EXECUTABLES "${bundle}/Contents/MacOS/ppm"
+     BUNDLE_EXECUTABLE "${bundle}/Contents/MacOS/ppm"
+     MODULES ${staged_plugins}
+     RESOLVED_DEPENDENCIES_VAR deployed
+     UNRESOLVED_DEPENDENCIES_VAR missing
+     CONFLICTING_DEPENDENCIES_PREFIX conflicts
+     PRE_EXCLUDE_REGEXES "^/System/Library/" "^/usr/lib/")
+if(missing)
+    message(FATAL_ERROR "Missing deployed dependencies: ${missing}")
+endif()
+foreach(name IN LISTS conflicts_FILENAMES)
+    set(paths "")
+    foreach(path IN LISTS conflicts_${name})
+        file(REAL_PATH "${path}" path)
+        list(APPEND paths "${path}")
+    endforeach()
+    list(REMOVE_DUPLICATES paths)
+    list(LENGTH paths count)
+    if(count GREATER 1)
+        message(FATAL_ERROR "Conflicting deployed dependency ${name}: ${paths}")
+    endif()
+    list(APPEND deployed ${paths})
+endforeach()
+file(REAL_PATH "${bundle}" bundle_real)
+foreach(dependency IN LISTS deployed)
+    file(REAL_PATH "${dependency}" dependency)
+    string(FIND "${dependency}" "${bundle_real}/" position)
+    if(NOT position EQUAL 0)
+        message(FATAL_ERROR "Dependency outside the app bundle: ${dependency}")
+    endif()
+endforeach()
+
+# Ad-hoc signing permits local execution after dependency paths are rewritten.
+# Distribution with Developer ID and notarization is a separate step.
+execute_process(COMMAND /usr/bin/codesign --force --deep --sign - "${bundle}"
+                RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE errors)
+if(NOT result EQUAL 0)
+    message(FATAL_ERROR "Ad-hoc signing failed: ${output}${errors}")
+endif()

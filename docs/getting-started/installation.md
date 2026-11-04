@@ -2,20 +2,20 @@
 
 # Installation
 
-PPM does not use an installer. Extract the distributed ZIP file and start `ppm.exe` inside it.
+PPM does not use an installer. On Windows, extract the distributed ZIP file and start `ppm.exe` inside it. For macOS, see the app layout below and the [build instructions](../about/contributing.md#building-and-running-on-macos).
 
 ## System requirements
 
 | Item | Requirement |
 |---|---|
-| OS | Windows 10 / 11 (64-bit) |
+| OS | Windows 10 / 11 (64-bit), or macOS compatible with the Qt libraries and architecture used in the build |
 | Network | Each PC can access the shared folder (file server or NAS) where the scene files are stored |
 | Applications for the work (optional) | CLIP STUDIO PAINT, TVPaint Animation, OpenToonz, a timesheet application that can open XDTS files, and so on. They are used to open the files of each scene from the PPM list |
 
 PPM itself works without these applications.
 If you do not set the path of an application in PPM, the file is opened with the application associated with its file extension (see [Initial Setup](initial-setup.md)).
 
-## Contents of the distribution
+## Windows distribution
 
 <!-- To be confirmed: once the distribution format (e.g. a ZIP on GitHub Releases) is decided, add the download link and the file name -->
 
@@ -46,17 +46,34 @@ To uninstall PPM, delete the extracted folder.
 If you also want to remove the per-user settings (made in [Initial Setup](initial-setup.md)),
 delete `%LOCALAPPDATA%\PPM\usersettings.ini` as well.
 
+## macOS app layout
+
+Place these items in the same writable folder, and open `ppm.app`:
+
+```text
+PPM/
+├─ ppm.app
+├─ conf.ini
+└─ stuff/
+```
+
+Keep `conf.ini` and Stuff outside the app bundle. With `StuffFolderPath=stuff`, PPM resolves Stuff relative to the folder containing `ppm.app`, independent of the working directory used to launch it. Moving the app alone does not move its configuration or production data. Preferences are stored in `~/Library/Preferences/PPM/usersettings.ini`; deleting this file removes the per-user settings.
+
+Mount SMB shares in Finder before opening a project, and use their local paths such as `/Volumes/Production/PPM/stuff`. Windows drive letters and UNC paths do not map automatically to macOS. For projects shared between Windows and Mac, use paths relative to Stuff wherever possible; set machine-specific application paths in Preferences. Project file and log formats are shared between the two platforms.
+
+On macOS, **Zip Folder** uses the system archive utility and stores the source folder's contents, including dotfiles, without adding macOS resource forks. The ZIP destination must be outside the source folder. Undo deletes the ZIP, as on Windows.
+
 ## conf.ini and the Stuff folder
 
 The **Stuff folder** contains the project files, translation files, rename scripts, and other files used by PPM.
-At startup, PPM reads `conf.ini` in the same folder as `ppm.exe` to find the Stuff folder.
+At startup, PPM reads `conf.ini` beside `ppm.exe` on Windows or beside `ppm.app` on macOS to find the Stuff folder.
 
 ```ini
 [General]
 StuffFolderPath=stuff
 ```
 
-- A relative path is relative to the folder containing `ppm.exe`. In the example above, the `stuff` folder next to `ppm.exe` is the Stuff folder.
+- A relative path is relative to the folder containing `conf.ini`. In the example above, its neighboring `stuff` folder is the Stuff folder.
 - You can also specify a Stuff folder on a shared folder.
   If everyone in the studio uses the same Stuff folder, the project settings can be managed in one place.
   In that case, the easiest way is to use forward slashes (`/`) as path separators (e.g. `StuffFolderPath=//fileserver/anime/PPM/stuff`).

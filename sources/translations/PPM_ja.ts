@@ -5098,6 +5098,14 @@ The application will start in English.
 <context>
     <name>UserSettingsPopup</name>
     <message>
+        <source>Applications (*.app);;All files (*)</source>
+        <translation>アプリケーション (*.app);;すべてのファイル (*)</translation>
+    </message>
+    <message>
+        <source>All files (*)</source>
+        <translation>すべてのファイル (*)</translation>
+    </message>
+    <message>
         <location filename="../usersettingspopup.cpp" line="31"/>
         <source>OK</source>
         <translation>OK</translation>

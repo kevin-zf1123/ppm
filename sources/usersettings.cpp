@@ -1,4 +1,5 @@
 #include "usersettings.h"
+#include "platform.h"
 
 #include <QSettings>
 #include <QStandardPaths>
@@ -11,10 +12,7 @@
 
 namespace {
 
-QString userSettingsPath() {
-  return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) +
-         "/usersettings.ini";
-}
+QString userSettingsPath() { return Platform::userSettingsFilePath(); }
 
 }  // namespace
 
@@ -28,13 +26,14 @@ UserSettings::UserSettings()
   // 既定のユーザ設定・ユーザ設定のどちらかで言語が指定されたか
   // （空文字列＝英語の指定もありうるため、値ではなくキーの有無で判定する）
   bool languageSpecified = false;
-  QSettings confSettings(qApp->applicationDirPath() + "/conf.ini",
-                         QSettings::IniFormat);
+  const QString configDir =
+      Platform::configurationDirectory(QCoreApplication::applicationDirPath());
+  QSettings confSettings(configDir + "/conf.ini", QSettings::IniFormat);
   QString stuffDirPath = confSettings.value("StuffFolderPath").toString();
   if (!stuffDirPath.isEmpty()) {
     QDir stuffDir(stuffDirPath);
     if (stuffDir.isRelative())
-      stuffDir.setPath(qApp->applicationDirPath() + "/" + stuffDir.path());
+      stuffDir.setPath(configDir + "/" + stuffDir.path());
     m_stuffFolderPath = stuffDir.absolutePath();
     std::cout << "m_stuffFolderPath = " << m_stuffFolderPath.toStdString()
               << std::endl;

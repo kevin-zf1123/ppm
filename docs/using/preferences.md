@@ -3,7 +3,7 @@
 # Preferences
 
 **Preferences** are settings for each PC user.
-Press the gear button (**Project Settings / Preferences**) at the top and choose **Preferences** from the menu to open them.
+Press the gear button (**Project Settings / Preferences**) at the top and choose **Preferences** from the menu to open them. On macOS, you can also press **Command+,** in the main window.
 
 The procedure for setting them up when you first use PPM is explained in [Initial Setup](../getting-started/initial-setup.md).
 This page summarizes what each item does and where the settings are saved.
@@ -21,25 +21,29 @@ This page summarizes what each item does and where the settings are saved.
 | **XDTS application path** | The application for opening timesheets (`.xdts`), such as XDTS Viewer or Toei Animation Digital Exposure Sheet. |
 | **OpenToonz executable path** | The application for opening `.tnz` files. |
 | **OpenToonz arguments** | Startup options added when opening `.tnz` files in OpenToonz. They are passed before the path of the file. You can write several options separated by spaces. Enclose a value that contains spaces in `"`. |
-| **User Name [USER_NAME]** | The name substituted for `[USER_NAME]` in the project settings. If empty, the Windows user name is used. |
+| **User Name [USER_NAME]** | The name substituted for `[USER_NAME]` in the project settings. If empty, the OS user name is used. |
 
-For an item whose application path is empty, files are opened with the application associated with the extension in Windows.
+For an item whose application path is empty, files are opened with the application associated with the extension in the OS.
 In that case, the OpenToonz arguments are not used.
 
 If the file at an application path cannot be found, or the translation file of the selected language cannot be found, a warning is shown when PPM starts.
+
+On macOS, choose an `.app` bundle or enter the path of an executable. TVPaint, CLIP STUDIO PAINT and XDTS applications receive a document-open event, reusing a running instance. For an OpenToonz `.app`, PPM starts a new instance and passes any options followed by the scene path on its command line, including when the options field is empty.
 
 ## Saving the settings
 
 Each item is saved when you finish entering it (when you move from the field to somewhere else).
 The **OK** button only closes the dialog.
 
-The preferences are saved in the following file.
+On Windows, preferences are saved in the following file.
 
 ```
 %LOCALAPPDATA%\PPM\usersettings.ini
 ```
 
 (This is usually `C:\Users\<user name>\AppData\Local\PPM\usersettings.ini`.)
+
+On macOS, preferences are saved in `~/Library/Preferences/PPM/usersettings.ini`.
 
 For items you have never changed in Preferences, the contents of `defaultusersettings.ini` in the Stuff folder are used as the initial values.
 See [The Stuff Folder](../administration/stuff-folder.md) for details.

@@ -40,8 +40,8 @@ If you develop with an AI coding tool, have it read `AGENTS.md` in the root of t
 |---|---|
 | OS | Windows 10 / 11 (64-bit) |
 | Compiler | Visual Studio 2022 ("Desktop development with C++") |
-| CMake | 3.5 or later |
-| Qt | Qt 6 (MSVC 2022 64-bit). Qt 6.12 is used for development. When installing, also select the additional library **Qt 5 Compatibility Module**. |
+| CMake | 3.21 or later |
+| Qt | Qt 6.8 or later (MSVC 2022 64-bit). Qt 6.12 is used for development. When installing, also select the additional library **Qt 5 Compatibility Module**. |
 
 The Qt modules used are Qt Widgets, Qt Network, Qt Core5Compat, Qt Concurrent, Qt QML, and Qt Linguist Tools.
 
@@ -81,6 +81,38 @@ To run `ppm.exe`, you need the Qt DLLs and `conf.ini`.
 
 The `stuff` folder has the sample project and data.
 To check that your build works, first follow the steps of the [Tutorial: Moving a Scene Through the Pipeline](../getting-started/tutorial.md).
+
+### Building and running on macOS
+
+Use Xcode Command Line Tools, CMake 3.21 or later, and a macOS Qt 6.8 or later installation with the modules listed above and Qt SVG. The supported macOS version and CPU architecture depend on the Qt installation and SDK used to build it. Set `QTDIR` to that Qt installation, or use `CMAKE_PREFIX_PATH`.
+
+```bash
+cmake -S sources -B build-macos -G Ninja -DQTDIR=/path/to/Qt/macos -DCMAKE_BUILD_TYPE=Release
+cmake --build build-macos --target deploy_macos
+open build-macos/macos/ppm.app
+```
+
+Install Ninja to use this generator, or omit `-G Ninja` to use the default generator. If the installed Qt and the default Xcode SDK are incompatible, select a compatible installed SDK with `-DCMAKE_OSX_SYSROOT=/path/to/MacOSX.sdk`.
+
+The deployable app is `build-macos/macos/ppm.app`. CMake creates `conf.ini` beside `ppm.app`, pointing to the repository's `stuff` folder. Existing `conf.ini` files are preserved. For multi-configuration generators, the undeployed app and configuration are in the selected configuration directory (for example, `build-macos/Release`); deployment always writes `build-macos/macos`. The sample project writes progress and logs into `stuff/sample_data`; use a separate copy of Stuff when testing file operations.
+
+The `deploy_macos` target builds the app, copies plugins from the same Qt installation used for linking, runs `macdeployqt`, and applies an ad-hoc signature for local execution. Run it again after rebuilding before moving the app to a Mac without Qt installed:
+
+```bash
+cmake --build build-macos --target deploy_macos
+```
+
+Distribute the resulting app together with `conf.ini` and a writable `stuff` folder outside the app; set `StuffFolderPath=stuff` in that configuration. Deployment includes Qt libraries and plugins; Developer ID signing and notarization are separate distribution steps. See [Qt's macOS deployment guide](https://doc.qt.io/qt-6/macos-deployment.html).
+
+The macOS app icon is `sources/macos/ppm.icns`, generated from the existing `sources/ppm.ico` artwork under the project license. To regenerate it on macOS, run `python3 sources/macos/create_icon.py`; normal builds use the checked-in icon and do not require Python.
+
+To run the focused platform behavior tests:
+
+```bash
+cmake -S sources -B build-macos -DPPM_BUILD_TESTS=ON
+cmake --build build-macos --target ppm_platform_tests
+ctest --test-dir build-macos -R '^ppm_platform_tests$' --output-on-failure
+```
 
 ### Coding style
 

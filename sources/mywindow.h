@@ -313,6 +313,7 @@ public slots:
   // カット登録・リテイクでカットの所属が変わった工程グループの詳細進捗を作り直す
   void onFlowGroupsChanged(const QList<FlowGroupId>& fgIds);
   void openProjectSettings();
+  void openPreferences();
   void onViewModeToggled();
   void onSettingsButtonClicked();  // 歯車アイコン：Project
                                    // Settings/Preferencesのメニューを出す

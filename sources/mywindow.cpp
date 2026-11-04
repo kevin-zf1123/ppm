@@ -1,4 +1,5 @@
 #include "mywindow.h"
+#include "platform.h"
 #include "usersettingspopup.h"
 #include "actionconfirmationdialog.h"
 #include "usersettings.h"
@@ -50,6 +51,7 @@
 #include <QFutureWatcher>
 #include <QPointer>
 #include <QAction>
+#include <QShortcut>
 #include <QImage>
 #include <QPixmap>
 #include <algorithm>
@@ -1060,11 +1062,11 @@ void MyTable::onOpenButtonClicked() {
       arguments << QProcess::splitCommand(
           UserSettings::instance()->getOpenToonzArgument());
     }
-    arguments << QDir::toNativeSeparators(path);
-
-    // QProcess * myProcess = new QProcess(this);
-    // m_process->start(program, arguments);
-    if (!QProcess::startDetached(program, arguments)) {
+    // OpenToonz reads scenes from argv, including when no options are set.
+    const auto mode = path.endsWith(".tnz")
+                          ? Platform::FileOpenMode::CommandLine
+                          : Platform::FileOpenMode::Document;
+    if (!Platform::openFile(program, path, arguments, mode)) {
       showStartProgramFailedMessage(program, path);
       return;
     }
@@ -1094,10 +1096,7 @@ void MyTable::onOpenXdtsButtonClicked() {
       showOpenWithDefaultAppFailedMessage(path);
     return;
   }
-  QStringList arguments;
-  arguments << path;
-  // m_process->start(program, arguments);
-  if (!QProcess::startDetached(program, arguments))
+  if (!Platform::openFile(program, path))
     showStartProgramFailedMessage(program, path);
 }
 
@@ -1996,9 +1995,14 @@ void MyTristateCheckBox::nextCheckState() {
 //----------------------------------------------
 
 MyWindow::MyWindow() : m_projectSettingsDialog(nullptr) {
-  m_registerDialog      = new RegisterDialog(this);
-  m_retakeDialog        = new RetakeDialog(this);
-  m_userSettingsPopup   = new UserSettingsPopup(this);
+  m_registerDialog    = new RegisterDialog(this);
+  m_retakeDialog      = new RetakeDialog(this);
+  m_userSettingsPopup = new UserSettingsPopup(this);
+#ifdef Q_OS_MACOS
+  auto* preferencesShortcut = new QShortcut(QKeySequence::Preferences, this);
+  connect(preferencesShortcut, &QShortcut::activated, this,
+          &MyWindow::openPreferences);
+#endif
   m_table               = new MyTable(this);
   m_sceneKnowledgePanel = new SceneKnowledgePanel(this);
   connect(m_sceneKnowledgePanel, &SceneKnowledgePanel::closeRequested, this,
@@ -3313,9 +3317,18 @@ void MyWindow::onSettingsButtonClicked() {
   if (chosen == projectSettingsAction)
     openProjectSettings();
   else if (chosen == preferencesAction)
-    m_userSettingsPopup->exec();
+    openPreferences();
   else if (chosen == aboutAction)
     onAboutTriggered();
+}
+
+void MyWindow::openPreferences() {
+  if (m_userSettingsPopup->isVisible()) {
+    m_userSettingsPopup->raise();
+    m_userSettingsPopup->activateWindow();
+    return;
+  }
+  m_userSettingsPopup->exec();
 }
 
 void MyWindow::openProjectSettings() {

@@ -174,10 +174,23 @@ UserSettingsPopup::UserSettingsPopup(QWidget* parent, Qt::WindowFlags f)
   connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
+namespace {
+QString applicationFilter() {
+#ifdef Q_OS_MACOS
+  return QCoreApplication::translate("UserSettingsPopup",
+                                     "Applications (*.app);;All files (*)");
+#elif defined(Q_OS_WIN)
+  return QCoreApplication::translate("UserSettingsPopup", "Executable (*.exe)");
+#else
+  return QCoreApplication::translate("UserSettingsPopup", "All files (*)");
+#endif
+}
+}  // namespace
+
 void UserSettingsPopup::onTvpBtnClicked() {
   QString exePath = QFileDialog::getOpenFileName(
       this, tr("Select TVPaint executable"),
-      UserSettings::instance()->getTvpBinaryPath(), tr("Executable (*.exe)"));
+      UserSettings::instance()->getTvpBinaryPath(), applicationFilter());
   if (exePath.isEmpty()) return;
   m_tvpPath->setText(exePath);
   UserSettings::instance()->setTvpBinaryPath(exePath);
@@ -190,7 +203,7 @@ void UserSettingsPopup::onTvpPathEdited() {
 void UserSettingsPopup::onCspBtnClicked() {
   QString exePath = QFileDialog::getOpenFileName(
       this, tr("Select Clip Studio executable"),
-      UserSettings::instance()->getCspBinaryPath(), tr("Executable (*.exe)"));
+      UserSettings::instance()->getCspBinaryPath(), applicationFilter());
   if (exePath.isEmpty()) return;
   m_cspPath->setText(exePath);
   UserSettings::instance()->setCspBinaryPath(exePath);
@@ -203,8 +216,7 @@ void UserSettingsPopup::onCspPathEdited() {
 void UserSettingsPopup::onXdtsBtnClicked() {
   QString exePath = QFileDialog::getOpenFileName(
       this, tr("Select XDTS Viewer executable"),
-      UserSettings::instance()->getXdtsViewerBinaryPath(),
-      tr("Executable (*.exe)"));
+      UserSettings::instance()->getXdtsViewerBinaryPath(), applicationFilter());
   if (exePath.isEmpty()) return;
   m_xdtsViewerPath->setText(exePath);
   UserSettings::instance()->setXdtsViewerBinaryPath(exePath);
@@ -217,8 +229,7 @@ void UserSettingsPopup::onXdtsPathEdited() {
 void UserSettingsPopup::onOtBtnClicked() {
   QString exePath = QFileDialog::getOpenFileName(
       this, tr("Select OpenToonz executable"),
-      UserSettings::instance()->getOpenToonzBinaryPath(),
-      tr("Executable (*.exe)"));
+      UserSettings::instance()->getOpenToonzBinaryPath(), applicationFilter());
   if (exePath.isEmpty()) return;
   m_otPath->setText(exePath);
   UserSettings::instance()->setOpenToonzBinaryPath(exePath);

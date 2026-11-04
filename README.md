@@ -3,7 +3,9 @@
 
 [日本語は下にあります](#ppm-日本語)
 
-PPM is a Windows application for managing the progress of animation production.
+PPM is a Windows and macOS application for managing the progress of animation production.
+
+The macOS work on this branch is an experimental feasibility prototype for discussion, not a supported release or a finalized contribution. See [the upstream discussion](https://github.com/opentoonz/ppm/issues/3).
 It looks at the files of each scene in a shared folder, lists which scene is in which workflow, and performs the file operations needed to move a scene forward (renaming, copying, writing to the cut list, and so on) with one button.
 
 ![The main window of PPM](docs/images/ja/home/main-window.png)
@@ -36,7 +38,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Bug reports and feature requests are wel
 
 ## PPM (日本語)
 
-PPM は、アニメーション制作の進捗を管理するための Windows 用ソフトウェアです。
+PPM は、アニメーション制作の進捗を管理するための Windows / macOS 用ソフトウェアです。
+
+このブランチの macOS 対応は、実現可能性を検討するための実験的な試作です。正式なサポート版や確定した提案ではありません。[上流の議論](https://github.com/opentoonz/ppm/issues/3) を参照してください。
 共有フォルダにあるカットのファイルを見て「どのカットが、いまどの工程にあるか」を一覧にし、工程を進めるときのファイル操作（リネーム・コピー・カット表の記録など）をボタンひとつで行います。
 
 ### 特長

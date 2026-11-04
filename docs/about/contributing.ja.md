@@ -40,8 +40,8 @@ AI のコーディングツールを使って開発するときは、リポジ�
 |---|---|
 | OS | Windows 10 / 11（64ビット） |
 | コンパイラ | Visual Studio 2022（「C++ によるデスクトップ開発」） |
-| CMake | 3.5 以上 |
-| Qt | Qt 6（MSVC 2022 64-bit 版）。開発では Qt 6.12 を使っています。インストールするときに、追加のライブラリの **Qt 5 Compatibility Module** も選んでください。 |
+| CMake | 3.21 以上 |
+| Qt | Qt 6.8 以上（MSVC 2022 64-bit 版）。開発では Qt 6.12 を使っています。インストールするときに、追加のライブラリの **Qt 5 Compatibility Module** も選んでください。 |
 
 使う Qt のモジュールは、Qt Widgets、Qt Network、Qt Core5Compat、Qt Concurrent、Qt QML、Qt Linguist Tools です。
 
@@ -81,6 +81,38 @@ cmake --build build --config Release
 
 `stuff` フォルダには、サンプルのプロジェクトとデータがあります。
 ビルドした PPM の動作は、まず [チュートリアル：カットを1つ最後まで進める](../getting-started/tutorial.ja.md) の手順で確かめてください。
+
+### macOS でビルドして動かす
+
+Xcode Command Line Tools、CMake 3.21 以上、上記のモジュールと Qt SVG を含む macOS 用 Qt 6.8 以上を使います。動作する macOS のバージョンと CPU アーキテクチャは、ビルドに使う Qt と SDK によります。`QTDIR` に Qt のインストール先を指定するか、`CMAKE_PREFIX_PATH` を使ってください。
+
+```bash
+cmake -S sources -B build-macos -G Ninja -DQTDIR=/path/to/Qt/macos -DCMAKE_BUILD_TYPE=Release
+cmake --build build-macos --target deploy_macos
+open build-macos/macos/ppm.app
+```
+
+このジェネレーターを使うには Ninja が必要です。`-G Ninja` を省略すると既定のジェネレーターを使います。インストール済みの Qt と既定の Xcode SDK が対応しない場合は、`-DCMAKE_OSX_SYSROOT=/path/to/MacOSX.sdk` で対応する SDK を選んでください。
+
+配布用アプリは `build-macos/macos/ppm.app` です。CMake は `ppm.app` の隣に `conf.ini` を作り、リポジトリの `stuff` フォルダを指定します。既存の `conf.ini` は上書きしません。複数の構成を持つジェネレーターでは、配布前のアプリと設定は選んだ構成のフォルダ（例：`build-macos/Release`）に置かれます。配布用の出力先は常に `build-macos/macos` です。サンプルプロジェクトは `stuff/sample_data` に進捗とログを書き込むため、ファイル操作のテストには Stuff の別コピーを使ってください。
+
+`deploy_macos` はアプリをビルドし、リンクに使った Qt と同じインストール先からプラグインをコピーして `macdeployqt` を実行し、ローカル実行用のアドホック署名を付けます。再ビルド後、Qt のない Mac に移す前にも実行してください。
+
+```bash
+cmake --build build-macos --target deploy_macos
+```
+
+できたアプリと一緒に、アプリの外に `conf.ini` と書き込み可能な `stuff` フォルダを置き、設定を `StuffFolderPath=stuff` にします。配布用ツールは Qt のライブラリとプラグインを組み込みます。Developer ID による署名と公証は別の配布手順です。[Qt の macOS 配布ガイド](https://doc.qt.io/qt-6/macos-deployment.html) も参照してください。
+
+macOS のアプリアイコンは `sources/macos/ppm.icns` です。プロジェクトのライセンスのもとで、既存の `sources/ppm.ico` から生成します。macOS で再生成するには `python3 sources/macos/create_icon.py` を実行してください。通常のビルドはリポジトリ内のアイコンを使うため、Python は不要です。
+
+プラットフォーム動作のテストは次のように実行します。
+
+```bash
+cmake -S sources -B build-macos -DPPM_BUILD_TESTS=ON
+cmake --build build-macos --target ppm_platform_tests
+ctest --test-dir build-macos -R '^ppm_platform_tests$' --output-on-failure
+```
 
 ### コードの書き方
 

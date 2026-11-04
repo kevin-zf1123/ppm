@@ -1,4 +1,5 @@
 #include "actionconfirmationdialog.h"
+#include "platform.h"
 #include "workflow.h"
 #include "googlegateway.h"
 #include "googlechatgateway.h"
@@ -244,12 +245,7 @@ bool StepExecutor::copyFolderRecursively(const QString& fromPath,
   const QString to   = QDir::cleanPath(QDir(toPath).absolutePath());
 
   // コピー先がコピー元自身、またはその内側にあると、コピーしたファイルまで再びコピー対象になってしまう
-#ifdef Q_OS_WIN
-  const Qt::CaseSensitivity cs = Qt::CaseInsensitive;
-#else
-  const Qt::CaseSensitivity cs = Qt::CaseSensitive;
-#endif
-  if (to.compare(from, cs) == 0 || to.startsWith(from + "/", cs)) {
+  if (Platform::isSameOrInsideDirectory(from, to)) {
     log.append(
         tr("(The destination is the source folder itself or is inside it) "));
     return false;
@@ -3924,7 +3920,6 @@ bool StepExecutor_ZipFolder::execute(QString& log, QVariant& checkSum) {
 
     // 操作に使うここで、難読化マクロをデコードして、実際のパスにする（画面・ログには、マクロのままのパスを使う）
     QString fromPath = realPath(m_orgFolderPath);
-    fromPath         = fromPath + "/*";
 
     QString toPath = realPath(m_zipFilePath);
 
@@ -3964,15 +3959,7 @@ bool StepExecutor_ZipFolder::execute(QString& log, QVariant& checkSum) {
       }
     }
 
-    QString program = "powershell.exe";
-
-    QStringList arguments;
-    arguments << "-Command" << "compress-archive" << "-Force" << fromPath
-              << toPath;
-
-    QProcess proc;
-    proc.start(program, arguments);
-    ok = ok && proc.waitForFinished(-1);
+    ok = Platform::zipFolder(fromPath, toPath);
 
     checkSum = m_zipFilePath;
     if (ok)
