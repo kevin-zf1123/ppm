@@ -41,7 +41,7 @@ On Windows, the preferences are saved in the following file.
 
 (This is usually `C:\Users\<user name>\AppData\Local\PPM\usersettings.ini`.)
 
-On macOS, the file is `~/Library/Preferences/PPM/usersettings.ini`, where `~` is your home folder. It is separate from the app bundle and the Stuff folder.
+On macOS, the file is `~/Library/Application Support/PPM/usersettings.ini`, where `~` is your home folder. It is separate from the app bundle and the Stuff folder.
 
 For items you have never changed in Preferences, the contents of `defaultusersettings.ini` in the Stuff folder are used as the initial values.
 See [The Stuff Folder](../administration/stuff-folder.md) for details.

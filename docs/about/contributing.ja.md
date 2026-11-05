@@ -96,16 +96,22 @@ cmake --build build --parallel
 
 `build/ppm.app` ができます。deployment target は Qt の既定値を使いますが、PPM のサポート対象は macOS 15 以降です。
 
-**`ppm.app` の隣**に `build/conf.ini` を作り、次のように記入します。
+ユーザーごとの設定フォルダを作ります。
+
+```bash
+mkdir -p "$HOME/Library/Application Support/PPM"
+```
+
+`~/Library/Application Support/PPM/conf.ini` を作り、Stuff フォルダの絶対パスを指定します。次の例のパスを、チェックアウト先に合わせて置き換えてください。
 
 ```ini
 [General]
-StuffFolderPath=../stuff
+StuffFolderPath=/absolute/path/to/ppm/stuff
 ```
 
-`open build/ppm.app` で起動します。インストールした Qt のライブラリを参照するソースビルドなので、Qt のインストール先を残してください。単体で配布できるアプリではありません。生成される `Contents/Resources/qt.conf` は、その Qt のプラグインを参照します。Xcode など複数の構成に対応するジェネレーターでは、`--config Release` を付けてビルドし、`build/Release` の `ppm.app` の隣に `conf.ini` を置いて、`StuffFolderPath=../../stuff` と指定します。
+`open build/ppm.app` で起動します。インストールした Qt のライブラリを参照するソースビルドなので、Qt のインストール先を残してください。単体で配布できるアプリではありません。生成される `Contents/Resources/qt.conf` は、その Qt のプラグインを参照します。Xcode など複数の構成に対応するジェネレーターでは、`--config Release` を付けてビルドし、`build/Release/ppm.app` を起動します。どのビルドも同じユーザー用の設定フォルダを使います。
 
-相対パスの `StuffFolderPath` は、作業ディレクトリに関係なく `conf.ini` のあるフォルダを起点に解決します。`/Volumes/anime/PPM/stuff` のようなローカルの絶対パスも使えます。ユーザーごとの設定は `~/Library/Preferences/PPM/usersettings.ini` に保存されます。[Stuff フォルダ](../administration/stuff-folder.ja.md) と [環境設定](../using/preferences.ja.md) も参照してください。
+相対パスの `StuffFolderPath` は、アプリの場所や作業ディレクトリに関係なく `~/Library/Application Support/PPM` を起点に解決します。`/Volumes/anime/PPM/stuff` のようなローカルの絶対パスも使えます。ユーザーごとの設定は `~/Library/Application Support/PPM/usersettings.ini` に保存されます。[Stuff フォルダ](../administration/stuff-folder.ja.md) と [環境設定](../using/preferences.ja.md) も参照してください。
 
 macOS のソースビルドは、起動と設定の読み書きに対応しています。外部アプリの選択・起動、ZIP 操作、Windows と macOS が混在する共有フォルダでの運用は、このビルドではサポートしていません。評価には Stuff フォルダと制作データのテスト用コピーを使ってください。サンプルプロジェクトを開くだけでも進捗ファイルが更新されることがあります。
 

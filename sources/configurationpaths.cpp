@@ -8,13 +8,11 @@ namespace ConfigurationPaths {
 
 QString configurationDirectory(const QString& executableDirectory) {
 #ifdef Q_OS_MACOS
-  QDir dir(executableDirectory);
-  if (dir.dirName() == "MacOS" && dir.cdUp() && dir.dirName() == "Contents" &&
-      dir.cdUp() && dir.dirName().endsWith(".app", Qt::CaseInsensitive) &&
-      dir.cdUp())
-    return dir.absolutePath();
-#endif
+  Q_UNUSED(executableDirectory);
+  return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#else
   return QDir(executableDirectory).absolutePath();
+#endif
 }
 
 QString stuffFolderPath(const QString& executableDirectory) {
@@ -29,7 +27,7 @@ QString stuffFolderPath(const QString& executableDirectory) {
 
 QString userSettingsFilePath() {
 #ifdef Q_OS_MACOS
-  const auto location = QStandardPaths::AppConfigLocation;
+  const auto location = QStandardPaths::AppDataLocation;
 #else
   const auto location = QStandardPaths::ConfigLocation;
 #endif

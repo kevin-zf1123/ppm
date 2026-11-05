@@ -96,16 +96,22 @@ cmake --build build --parallel
 
 This creates `build/ppm.app`. The build uses Qt's default deployment target; PPM's supported macOS versions start at 15.
 
-Create `build/conf.ini` **next to `ppm.app`**, with:
+Create the per-user configuration directory:
+
+```bash
+mkdir -p "$HOME/Library/Application Support/PPM"
+```
+
+Create `~/Library/Application Support/PPM/conf.ini` and set the absolute path to your Stuff folder (replace the example path with your checkout location):
 
 ```ini
 [General]
-StuffFolderPath=../stuff
+StuffFolderPath=/absolute/path/to/ppm/stuff
 ```
 
-Start the application with `open build/ppm.app`. Keep the Qt installation available: this is a source build linked to the installed Qt libraries, not a self-contained distribution. Its generated `Contents/Resources/qt.conf` points to the plugins from that Qt installation. With a multi-configuration generator such as Xcode, build with `--config Release`, put `conf.ini` in `build/Release` next to `ppm.app`, and use `StuffFolderPath=../../stuff`.
+Start the application with `open build/ppm.app`. Keep the Qt installation available: this is a source build linked to the installed Qt libraries, not a self-contained distribution. Its generated `Contents/Resources/qt.conf` points to the plugins from that Qt installation. With a multi-configuration generator such as Xcode, build with `--config Release` and start `build/Release/ppm.app`. All builds use the same per-user configuration directory.
 
-PPM resolves a relative `StuffFolderPath` from the directory containing `conf.ini`, independently of the working directory. An absolute local path such as `/Volumes/anime/PPM/stuff` also works. Per-user settings are stored in `~/Library/Preferences/PPM/usersettings.ini`; see [The Stuff Folder](../administration/stuff-folder.md) and [Preferences](../using/preferences.md).
+PPM resolves a relative `StuffFolderPath` from `~/Library/Application Support/PPM`, independently of the app location and working directory. An absolute local path such as `/Volumes/anime/PPM/stuff` also works. Per-user settings are stored in `~/Library/Application Support/PPM/usersettings.ini`; see [The Stuff Folder](../administration/stuff-folder.md) and [Preferences](../using/preferences.md).
 
 The macOS source build covers startup and configuration. External application selection/launching, ZIP actions, and mixed Windows/macOS shared-folder workflows are not supported in this build. Use a separate test copy of the Stuff folder and production data when evaluating it; opening the sample project can update its progress files.
 

@@ -1,32 +1,63 @@
 #include "configurationpaths.h"
 
 #include <QDir>
+#include <QFileInfo>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QtTest>
+#include <memory>
 
 class ConfigurationPathsTest : public QObject {
   Q_OBJECT
 
+#ifdef Q_OS_MACOS
+  std::unique_ptr<QTemporaryDir> m_settingsDirectory;
+#endif
+
 private slots:
+  void init() {
+    QStandardPaths::setTestModeEnabled(true);
+    QCoreApplication::setOrganizationName(QString());
+#ifdef Q_OS_MACOS
+    // Give each case its own application data directory, cleaned up by RAII.
+    const QString parent =
+        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    QVERIFY(QDir().mkpath(parent));
+    m_settingsDirectory.reset(
+        new QTemporaryDir(parent + "/PPM-path-tests-XXXXXX"));
+    QVERIFY(m_settingsDirectory->isValid());
+    QCoreApplication::setApplicationName(
+        QFileInfo(m_settingsDirectory->path()).fileName());
+#else
+    QCoreApplication::setApplicationName("PPM");
+#endif
+  }
+
   void configurationDirectory() {
     QTemporaryDir root;
     QVERIFY(root.isValid());
     const QString bundle = root.filePath("PPM 日本語.app/Contents/MacOS");
     QVERIFY(QDir().mkpath(bundle));
 #ifdef Q_OS_MACOS
-    QCOMPARE(ConfigurationPaths::configurationDirectory(bundle), root.path());
+    QCOMPARE(ConfigurationPaths::configurationDirectory(bundle),
+             m_settingsDirectory->path());
 #else
     QCOMPARE(ConfigurationPaths::configurationDirectory(bundle), bundle);
 #endif
     const QString plain = root.filePath("bin");
     QVERIFY(QDir().mkpath(plain));
-    QCOMPARE(ConfigurationPaths::configurationDirectory(plain), plain);
-
     const QString nonBundle = root.filePath("plain/Contents/MacOS");
     QVERIFY(QDir().mkpath(nonBundle));
+#ifdef Q_OS_MACOS
+    QCOMPARE(ConfigurationPaths::configurationDirectory(plain),
+             m_settingsDirectory->path());
+    QCOMPARE(ConfigurationPaths::configurationDirectory(nonBundle),
+             m_settingsDirectory->path());
+#else
+    QCOMPARE(ConfigurationPaths::configurationDirectory(plain), plain);
     QCOMPARE(ConfigurationPaths::configurationDirectory(nonBundle), nonBundle);
+#endif
   }
 
   void stuffFolder_data() {
@@ -53,7 +84,7 @@ private slots:
     QVERIFY(QDir().mkpath(executableDir));
     QString configDir = executableDir;
 #ifdef Q_OS_MACOS
-    if (bundle) configDir = root.path();
+    configDir = m_settingsDirectory->path();
 #endif
     if (!path.isNull()) {
       QSettings settings(configDir + "/conf.ini", QSettings::IniFormat);
@@ -71,15 +102,18 @@ private slots:
   }
 
   void userSettingsLocation() {
-    QStandardPaths::setTestModeEnabled(true);
-    QCoreApplication::setApplicationName("PPM");
 #ifdef Q_OS_MACOS
+    QCOMPARE(ConfigurationPaths::userSettingsFilePath(),
+             m_settingsDirectory->filePath("usersettings.ini"));
     QCOMPARE(
-        ConfigurationPaths::userSettingsFilePath(),
-        QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) +
-            "/usersettings.ini");
-    QVERIFY(ConfigurationPaths::userSettingsFilePath().endsWith(
-        "/PPM/usersettings.ini"));
+        QFileInfo(ConfigurationPaths::userSettingsFilePath()).absolutePath(),
+        ConfigurationPaths::configurationDirectory(
+            "/Applications/ppm.app/Contents/MacOS"));
+    QCoreApplication::setApplicationName("PPM");
+    QCOMPARE(
+        ConfigurationPaths::configurationDirectory(QString()),
+        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+            "/PPM");
 #else
     QCOMPARE(ConfigurationPaths::userSettingsFilePath(),
              QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) +

@@ -4,7 +4,8 @@
 
 namespace ConfigurationPaths {
 
-// conf.ini lives next to the app bundle on macOS, or next to the executable.
+// conf.ini lives in per-user Application Support on macOS, or next to the
+// executable.
 QString configurationDirectory(const QString& executableDirectory);
 QString stuffFolderPath(const QString& executableDirectory);
 QString userSettingsFilePath();
