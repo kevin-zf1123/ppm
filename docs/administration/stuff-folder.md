@@ -37,6 +37,8 @@ When paths such as the root folder are written as relative paths in the project 
 
 When PPM starts, it reads `conf.ini` in the same folder as `ppm.exe` to find the Stuff folder.
 
+On macOS, place `conf.ini` next to `ppm.app`, outside the app bundle. Relative paths are resolved from that folder, and absolute paths must be accessible on the Mac (for example, `/Volumes/anime/PPM/stuff`). See [Building and starting on macOS](../about/contributing.md#building-and-starting-on-macos) for the source-build setup and its limitations.
+
 ```ini
 [General]
 StuffFolderPath=//fileserver/anime/PPM/stuff
@@ -73,7 +75,7 @@ XdtsViewerBinaryPath=
 | `OpenToonzArgument` | **OpenToonz arguments** |
 | `XdtsViewerBinaryPath` | **XDTS application path** |
 
-- Keys that are not written, and empty keys, keep the default of Preferences (empty). However, if `LanguageCode` is not written, the display language of Windows is used (English if there is no translation file for that language).
+- Keys that are not written, and empty keys, keep the default of Preferences (empty). However, if `LanguageCode` is not written, the operating system's display language is used (English if there is no translation file for that language).
 - The **User Name [USER_NAME]** cannot be given an initial value.
 - Use slashes (`/`) as path separators. Backslashes are treated the same way as in `conf.ini`.
 - The path above is an example. Check the actual installation location.

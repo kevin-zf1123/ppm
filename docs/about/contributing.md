@@ -34,7 +34,7 @@ If you develop with an AI coding tool, have it read `AGENTS.md` in the root of t
 
 ## Building from source
 
-### Requirements
+### Windows requirements
 
 | Item | Details |
 |---|---|
@@ -45,7 +45,7 @@ If you develop with an AI coding tool, have it read `AGENTS.md` in the root of t
 
 The Qt modules used are Qt Widgets, Qt Network, Qt Core5Compat, Qt Concurrent, Qt QML, and Qt Linguist Tools.
 
-### Build steps
+### Building on Windows
 
 Run the following in the repository folder.
 For `QTDIR`, give the folder where Qt is installed (the folder that has `bin` and `lib`).
@@ -62,7 +62,7 @@ cmake --build build --config Release
 This creates `build/Release/ppm.exe`.
 You can also open `ppm.sln` in the `build` folder in Visual Studio and build it there.
 
-### Running it
+### Running on Windows
 
 To run `ppm.exe`, you need the Qt DLLs and `conf.ini`.
 
@@ -81,6 +81,43 @@ To run `ppm.exe`, you need the Qt DLLs and `conf.ini`.
 
 The `stuff` folder has the sample project and data.
 To check that your build works, first follow the steps of the [Tutorial: Moving a Scene Through the Pipeline](../getting-started/tutorial.md).
+
+### Building and starting on macOS
+
+Source builds target **macOS 15 or later on Apple Silicon (arm64), with Qt 6.12**. Intel Macs are outside the supported scope. Install Xcode 16 or later (including its command-line tools), CMake, and Qt for macOS with **Qt SVG** and the **Qt 5 Compatibility Module**. Use a CMake version supported by your Qt installation.
+
+Run these commands from the repository folder, adjusting `QTDIR` to the Qt installation directory:
+
+```bash
+export QTDIR="$HOME/Qt/6.12.0/macos"
+"$QTDIR/bin/qt-cmake" -S sources -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 -DQTDIR="$QTDIR"
+cmake --build build --parallel
+```
+
+This creates `build/ppm.app`. The build uses Qt's default deployment target; PPM's supported macOS versions start at 15.
+
+Create `build/conf.ini` **next to `ppm.app`**, with:
+
+```ini
+[General]
+StuffFolderPath=../stuff
+```
+
+Start the application with `open build/ppm.app`. Keep the Qt installation available: this is a source build linked to the installed Qt libraries, not a self-contained distribution. Its generated `Contents/Resources/qt.conf` points to the plugins from that Qt installation. With a multi-configuration generator such as Xcode, build with `--config Release`, put `conf.ini` in `build/Release` next to `ppm.app`, and use `StuffFolderPath=../../stuff`.
+
+PPM resolves a relative `StuffFolderPath` from the directory containing `conf.ini`, independently of the working directory. An absolute local path such as `/Volumes/anime/PPM/stuff` also works. Per-user settings are stored in `~/Library/Preferences/PPM/usersettings.ini`; see [The Stuff Folder](../administration/stuff-folder.md) and [Preferences](../using/preferences.md).
+
+The macOS source build covers startup and configuration. External application selection/launching, ZIP actions, and mixed Windows/macOS shared-folder workflows are not supported in this build. Use a separate test copy of the Stuff folder and production data when evaluating it; opening the sample project can update its progress files.
+
+### Focused startup tests
+
+Add `-DPPM_BUILD_TESTS=ON` to the configure command, build, and run:
+
+```bash
+ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag)_tests$' --output-on-failure
+```
+
+These tests cover configuration lookup, relative and absolute Stuff paths, the per-user settings location, and scene-tag destruction during shutdown. GitHub Actions builds the application and runs these tests on Windows x64 and macOS arm64 with Qt 6.12. Native UI startup and production file-server workflows require separate checks.
 
 ### Coding style
 

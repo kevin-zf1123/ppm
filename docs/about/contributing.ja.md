@@ -34,7 +34,7 @@ AI のコーディングツールを使って開発するときは、リポジ�
 
 ## ソースからのビルド
 
-### 必要なもの
+### Windows で必要なもの
 
 | もの | 内容 |
 |---|---|
@@ -45,7 +45,7 @@ AI のコーディングツールを使って開発するときは、リポジ�
 
 使う Qt のモジュールは、Qt Widgets、Qt Network、Qt Core5Compat、Qt Concurrent、Qt QML、Qt Linguist Tools です。
 
-### ビルドの手順
+### Windows でのビルド
 
 リポジトリのフォルダで、次のように実行します。
 `QTDIR` には、Qt をインストールしたフォルダ（`bin` や `lib` があるフォルダ）を指定します。
@@ -62,7 +62,7 @@ cmake --build build --config Release
 `build/Release/ppm.exe` ができます。
 `build` フォルダにできる `ppm.sln` を Visual Studio で開いて、ビルドすることもできます。
 
-### 動かす
+### Windows で動かす
 
 `ppm.exe` を動かすには、Qt の DLL と、`conf.ini` が必要です。
 
@@ -81,6 +81,43 @@ cmake --build build --config Release
 
 `stuff` フォルダには、サンプルのプロジェクトとデータがあります。
 ビルドした PPM の動作は、まず [チュートリアル：カットを1つ最後まで進める](../getting-started/tutorial.ja.md) の手順で確かめてください。
+
+### macOS でのビルドと起動
+
+ソースからのビルドは、**macOS 15 以降、Apple Silicon（arm64）、Qt 6.12** を対象とします。Intel Mac はサポート対象外です。Xcode 16 以降（コマンドラインツールを含む）、CMake、macOS 用 Qt、**Qt SVG**、**Qt 5 Compatibility Module** をインストールしてください。CMake は使用する Qt が対応するバージョンを選びます。
+
+リポジトリのフォルダで、`QTDIR` を Qt のインストール先に合わせて実行します。
+
+```bash
+export QTDIR="$HOME/Qt/6.12.0/macos"
+"$QTDIR/bin/qt-cmake" -S sources -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 -DQTDIR="$QTDIR"
+cmake --build build --parallel
+```
+
+`build/ppm.app` ができます。deployment target は Qt の既定値を使いますが、PPM のサポート対象は macOS 15 以降です。
+
+**`ppm.app` の隣**に `build/conf.ini` を作り、次のように記入します。
+
+```ini
+[General]
+StuffFolderPath=../stuff
+```
+
+`open build/ppm.app` で起動します。インストールした Qt のライブラリを参照するソースビルドなので、Qt のインストール先を残してください。単体で配布できるアプリではありません。生成される `Contents/Resources/qt.conf` は、その Qt のプラグインを参照します。Xcode など複数の構成に対応するジェネレーターでは、`--config Release` を付けてビルドし、`build/Release` の `ppm.app` の隣に `conf.ini` を置いて、`StuffFolderPath=../../stuff` と指定します。
+
+相対パスの `StuffFolderPath` は、作業ディレクトリに関係なく `conf.ini` のあるフォルダを起点に解決します。`/Volumes/anime/PPM/stuff` のようなローカルの絶対パスも使えます。ユーザーごとの設定は `~/Library/Preferences/PPM/usersettings.ini` に保存されます。[Stuff フォルダ](../administration/stuff-folder.ja.md) と [環境設定](../using/preferences.ja.md) も参照してください。
+
+macOS のソースビルドは、起動と設定の読み書きに対応しています。外部アプリの選択・起動、ZIP 操作、Windows と macOS が混在する共有フォルダでの運用は、このビルドではサポートしていません。評価には Stuff フォルダと制作データのテスト用コピーを使ってください。サンプルプロジェクトを開くだけでも進捗ファイルが更新されることがあります。
+
+### 起動に関するテスト
+
+構成時のコマンドに `-DPPM_BUILD_TESTS=ON` を追加してビルドし、次を実行します。
+
+```bash
+ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag)_tests$' --output-on-failure
+```
+
+設定ファイルの検索、Stuff フォルダの相対・絶対パス、ユーザー設定の保存先、終了時のカット情報タグの破棄を検証します。GitHub Actions は、Qt 6.12 を使って Windows x64 と macOS arm64 でビルドし、これらのテストを実行します。実際の画面の起動と制作現場のファイルサーバーでの動作は、別途確認が必要です。
 
 ### コードの書き方
 

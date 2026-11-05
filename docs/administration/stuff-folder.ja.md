@@ -37,6 +37,8 @@ stuff/
 
 PPM は起動時に、`ppm.exe` と同じフォルダにある `conf.ini` を読んで、Stuff フォルダの場所を知ります。
 
+macOS では、アプリの内部ではなく `ppm.app` の隣に `conf.ini` を置きます。相対パスはそのフォルダを起点に解決し、絶対パスには Mac からアクセスできるパス（例：`/Volumes/anime/PPM/stuff`）を指定します。ソースビルドの設定方法と制限は、[macOS でのビルドと起動](../about/contributing.ja.md#macos-でのビルドと起動) を参照してください。
+
 ```ini
 [General]
 StuffFolderPath=//fileserver/anime/PPM/stuff
@@ -73,7 +75,7 @@ XdtsViewerBinaryPath=
 | `OpenToonzArgument` | **OpenToonz起動時の引数** |
 | `XdtsViewerBinaryPath` | **XDTS用アプリケーションのパス** |
 
-- 書かなかったキーと、空のキーは、環境設定の既定のまま（空欄）になります。ただし `LanguageCode` は、書かなかった場合、Windows の表示言語に合わせます（その言語の翻訳ファイルが無いときは英語）。
+- 書かなかったキーと、空のキーは、環境設定の既定のまま（空欄）になります。ただし `LanguageCode` は、書かなかった場合、OS の表示言語に合わせます（その言語の翻訳ファイルが無いときは英語）。
 - **ユーザー名 [USER_NAME]** は、初期値を決められません。
 - パスの区切りには、スラッシュ（`/`）を使ってください。バックスラッシュの扱いは、`conf.ini` と同じです。
 - 上のパスは例です。実際のインストール先を確かめて書いてください。
