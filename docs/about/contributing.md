@@ -125,6 +125,19 @@ ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag)_tests$' 
 
 These tests cover configuration lookup, relative and absolute Stuff paths, the per-user settings location, and scene-tag destruction during shutdown. GitHub Actions builds the application and runs these tests on Windows x64 and macOS arm64 with Qt 6.12. Native UI startup and production file-server workflows require separate checks.
 
+### Downloading CI application packages
+
+After a successful **Build** workflow run, open that run in the repository's **Actions** tab and download its **Artifacts**. The artifact names include the platform and source commit. They are kept for 14 days. A GitHub login is required to download them.
+
+Extract the downloaded artifact ZIP, then extract the application archive inside it:
+
+- `ppm-windows-x64.zip`: contains `PPM/ppm.exe`, Qt runtime dependencies, and `conf.ini` pointing to the included `stuff` folder. If the MSVC runtime is missing, install the Microsoft Visual C++ x64 Redistributable included by `windeployqt` or download it from [Microsoft](https://aka.ms/vs/17/release/vc_redist.x64.exe).
+- `ppm-macos-arm64.tar.gz`: contains `PPM/ppm.app` with Qt frameworks and plugins. The tar archive preserves executable permissions and framework symlinks. Configure `~/Library/Application Support/PPM/conf.ini` as described above, using the absolute path to the extracted `PPM/stuff` folder. The app has an ad-hoc signature and is not notarized. If macOS blocks a build you trust, allow it in **System Settings > Privacy & Security > Open Anyway**.
+
+Both packages include sample data, license files, English and Japanese manuals, and `BUILD.txt` identifying the source commit. These are development builds for evaluation with copies of your data. The macOS feature limitations listed above also apply to these packages.
+
+CI deploys Qt into a separate staging directory, checks macOS dependency paths and signatures, and checks that the packaged application stays running for five seconds without Qt on `PATH`. This startup smoke check terminates the process afterward; it does not exercise UI interactions or production workflows.
+
 ### Coding style
 
 Before opening a pull request, always run clang-format on the C++ code you changed.

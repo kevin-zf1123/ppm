@@ -20,10 +20,12 @@ jobs:
             os: windows-2022
             qt-host: windows
             qt-arch: win64_msvc2022_64
+            artifact: windows-x64
           - name: macOS arm64
             os: macos-15
             qt-host: mac
             qt-arch: clang_64
+            artifact: macos-arm64
     steps:
       - uses: actions/checkout@v4
       - name: Install Qt
@@ -47,3 +49,13 @@ jobs:
         run: cmake --build build --config Release --parallel 3
       - name: Test startup behavior
         run: ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag)_tests$' --output-on-failure
+      - name: Package and smoke-test application
+        run: python .github/scripts/package-artifact.py
+      - name: Upload application
+        uses: actions/upload-artifact@v4
+        with:
+          name: ppm-${{ matrix.artifact }}-${{ github.sha }}
+          path: build/artifacts/*
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
