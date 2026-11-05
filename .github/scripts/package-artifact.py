@@ -90,6 +90,15 @@ def main():
             config.unlink()
             run(qt_dir / "bin/macdeployqt", bundle, "-always-overwrite", "-no-codesign")
             config.write_text("[Paths]\nPlugins=PlugIns\n", encoding="utf-8")
+            # Plugins can retain rpaths for the Qt installation layout. Give
+            # each loader its own path to the deployed frameworks instead of
+            # relying on the main executable's search paths.
+            for plugin in (bundle / "Contents/PlugIns").rglob("*.dylib"):
+                rpath = "@loader_path/" + os.path.relpath(
+                    bundle / "Contents/Frameworks", plugin.parent)
+                commands = subprocess.check_output(["otool", "-l", str(plugin)], text=True)
+                if f"path {rpath} (offset" not in commands:
+                    run("install_name_tool", "-add_rpath", rpath, plugin)
             run("cmake", f"-DBUNDLE={bundle}", "-P",
                 repository / ".github/scripts/verify-macos-bundle.cmake")
             run("codesign", "--force", "--deep", "--sign", "-", bundle)
