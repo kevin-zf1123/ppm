@@ -33,6 +33,9 @@ jobs:
           host: ${{ matrix.qt-host }}
           arch: ${{ matrix.qt-arch }}
           modules: qt5compat
+          # aqtinstall 3.3.0 cannot read the Qt 6.11+ Windows repository layout.
+          # Pin upstream's fix until it is available in a release (aqtinstall#1000).
+          aqtsource: git+https://github.com/miurahr/aqtinstall.git@076e1659807d0b362a3ed684d54c2e9c775eb9c7
           cache: true
       - name: Configure Windows
         if: runner.os == 'Windows'
