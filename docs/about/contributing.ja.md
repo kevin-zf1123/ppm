@@ -131,7 +131,7 @@ ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag)_tests$' 
 
 ダウンロードしたアーティファクトの ZIP を展開し、中のアプリ用アーカイブも展開します。
 
-- `ppm-windows-x64.zip`: `PPM/ppm.exe`、Qt の実行用ライブラリ、同梱の `stuff` フォルダを指定する `conf.ini` が入っています。MSVC ランタイムがなければ、`windeployqt` が同梱する Microsoft Visual C++ x64 再頒布可能パッケージをインストールするか、[Microsoft](https://aka.ms/vs/17/release/vc_redist.x64.exe) から入手してください。
+- `ppm-windows-x64.zip`: `PPM/ppm.exe`、Qt の実行用ライブラリ、同梱の `stuff` フォルダを指定する `conf.ini` が入っています。MSVC ランタイムがなければ、同梱の `vc_redist.x64.exe`（Microsoft Visual C++ x64 再頒布可能パッケージ）をインストールするか、[Microsoft](https://aka.ms/vs/17/release/vc_redist.x64.exe) から入手してください。
 - `ppm-macos-arm64.tar.gz`: Qt のフレームワークとプラグインを含む `PPM/ppm.app` が入っています。tar アーカイブは実行権限とフレームワークのシンボリックリンクを保持します。上記の手順で `~/Library/Application Support/PPM/conf.ini` を作り、展開した `PPM/stuff` フォルダの絶対パスを指定してください。アプリは ad-hoc 署名付きですが、公証はされていません。信頼できるビルドが macOS にブロックされた場合は、**システム設定 > プライバシーとセキュリティ > このまま開く** で許可します。
 
 どちらにもサンプルデータ、ライセンス、英語・日本語マニュアル、ソースのコミットを示す `BUILD.txt` が含まれます。評価用の開発ビルドなので、データのコピーを使ってください。上記の macOS の機能制限は、これらのパッケージにも適用されます。

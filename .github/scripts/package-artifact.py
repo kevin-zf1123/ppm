@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import urllib.request
 import zipfile
 
 
@@ -107,8 +108,22 @@ def main():
         else:
             executable = package / "ppm.exe"
             shutil.copy2(build / "Release/ppm.exe", executable)
-            run(qt_dir / "bin/windeployqt.exe", "--release", "--compiler-runtime",
+            run(qt_dir / "bin/windeployqt.exe", "--release", "--no-compiler-runtime",
                 executable)
+            # Ship Microsoft's redistributable installer explicitly: on a CI
+            # runner windeployqt may not discover an MSVC redistributable.
+            urllib.request.urlretrieve(
+                "https://aka.ms/vs/17/release/vc_redist.x64.exe",
+                package / "vc_redist.x64.exe",
+            )
+            subprocess.run(
+                ["pwsh", "-NoProfile", "-Command",
+                 '$signature = Get-AuthenticodeSignature -LiteralPath ./vc_redist.x64.exe; '
+                 'if ($signature.Status -ne "Valid" -or '
+                 '$signature.SignerCertificate.Subject -notlike "*Microsoft Corporation*") '
+                 '{ throw "Invalid Microsoft redistributable signature" }'],
+                cwd=package, check=True,
+            )
 
         smoke_test(executable, qt_dir, temporary)
         if sys.platform == "win32":
