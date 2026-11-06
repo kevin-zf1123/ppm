@@ -7,12 +7,31 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-import urllib.request
 import zipfile
 
 
 def run(*args):
     subprocess.run([str(arg) for arg in args], check=True)
+
+
+def deploy_msvc_runtime(build, package):
+    # Use the VS instance selected by CMake and its newest x64 v143 CRT.
+    cache = (build / "CMakeCache.txt").read_text(encoding="utf-8").splitlines()
+    instance = next(line.split("=", 1)[1].split(",version=")[0]
+                    for line in cache if line.startswith("CMAKE_GENERATOR_INSTANCE:"))
+    redist = Path(instance) / "VC/Redist/MSVC"
+    crt_subdir = Path("x64/Microsoft.VC143.CRT")
+    versions = [path for path in redist.iterdir()
+                if all(part.isdecimal() for part in path.name.split("."))
+                and (path / crt_subdir).is_dir()]
+    if not versions:
+        raise RuntimeError(f"No redistributable x64 VC143 CRT in {redist}")
+    latest = max(versions, key=lambda path: tuple(map(int, path.name.split("."))))
+    crt = latest / crt_subdir
+    # Match the five application-local runtime DLLs in the upstream win64 ZIP.
+    for name in ("msvcp140.dll", "msvcp140_1.dll", "msvcp140_2.dll",
+                 "vcruntime140.dll", "vcruntime140_1.dll"):
+        shutil.copy2(crt / name, package / name)
 
 
 def smoke_test(executable, qt_dir, temporary):
@@ -50,6 +69,15 @@ def smoke_test(executable, qt_dir, temporary):
                 code = process.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 print("Native application stayed running for five seconds.", flush=True)
+                if sys.platform == "win32":
+                    subprocess.run(
+                        ["pwsh", "-NoProfile", "-Command",
+                         f"$loaded = (Get-Process -Id {process.pid} -ErrorAction Stop).Modules.FileName; "
+                         "foreach ($name in 'msvcp140.dll','vcruntime140.dll') { "
+                         "if ($loaded -notcontains (Join-Path $PWD $name)) { "
+                         'throw "Application-local $name was not loaded" } }'],
+                        cwd=executable.parent, check=True,
+                    )
             else:
                 raise RuntimeError(f"Application exited during startup: {code}")
         finally:
@@ -110,20 +138,7 @@ def main():
             shutil.copy2(build / "Release/ppm.exe", executable)
             run(qt_dir / "bin/windeployqt.exe", "--release", "--no-compiler-runtime",
                 executable)
-            # Ship Microsoft's redistributable installer explicitly: on a CI
-            # runner windeployqt may not discover an MSVC redistributable.
-            urllib.request.urlretrieve(
-                "https://aka.ms/vs/17/release/vc_redist.x64.exe",
-                package / "vc_redist.x64.exe",
-            )
-            subprocess.run(
-                ["pwsh", "-NoProfile", "-Command",
-                 '$signature = Get-AuthenticodeSignature -LiteralPath ./vc_redist.x64.exe; '
-                 'if ($signature.Status -ne "Valid" -or '
-                 '$signature.SignerCertificate.Subject -notlike "*Microsoft Corporation*") '
-                 '{ throw "Invalid Microsoft redistributable signature" }'],
-                cwd=package, check=True,
-            )
+            deploy_msvc_runtime(build, package)
 
         smoke_test(executable, qt_dir, temporary)
         if sys.platform == "win32":

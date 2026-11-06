@@ -131,7 +131,7 @@ After a successful **Build** workflow run, open that run in the repository's **A
 
 Extract the downloaded artifact ZIP, then extract the application archive inside it:
 
-- `ppm-windows-x64.zip`: contains `PPM/ppm.exe`, Qt runtime dependencies, and `conf.ini` pointing to the included `stuff` folder. If the MSVC runtime is missing, install the included `vc_redist.x64.exe` (Microsoft Visual C++ x64 Redistributable) or download it from [Microsoft](https://aka.ms/vs/17/release/vc_redist.x64.exe).
+- `ppm-windows-x64.zip`: contains `PPM/ppm.exe`, Qt runtime dependencies, and `conf.ini` pointing to the included `stuff` folder. The Visual C++ runtime DLLs are included next to `ppm.exe`.
 - `ppm-macos-arm64.tar.gz`: contains `PPM/ppm.app` with Qt frameworks and plugins. The tar archive preserves executable permissions and framework symlinks. Configure `~/Library/Application Support/PPM/conf.ini` as described above, using the absolute path to the extracted `PPM/stuff` folder. The app has an ad-hoc signature and is not notarized. If macOS blocks a build you trust, allow it in **System Settings > Privacy & Security > Open Anyway**.
 
 Both packages include sample data, license files, English and Japanese manuals, and `BUILD.txt` identifying the source commit. These are development builds for evaluation with copies of your data. The macOS feature limitations listed above also apply to these packages.

@@ -8,9 +8,7 @@ Use a copy of your data when testing. This is a development build, not a release
 
 Windows x64:
   Extract the entire ZIP and open PPM/ppm.exe. conf.ini selects the included
-  stuff folder. If Windows reports a missing MSVC runtime, install the Microsoft
-  Visual C++ x64 Redistributable (vc_redist.x64.exe) in this package, or obtain it from
-  https://aka.ms/vs/17/release/vc_redist.x64.exe .
+  stuff folder. The required Visual C++ runtime DLLs are next to ppm.exe.
 
 macOS 15 or later, Apple Silicon:
   Extract the tar.gz archive (tar -xzf ppm-macos-arm64.tar.gz).
@@ -37,9 +35,7 @@ docs/ 内の英語・日本語マニュアルが含まれます。ソースの�
 
 Windows x64:
   ZIP 全体を展開して PPM/ppm.exe を起動します。conf.ini は同梱の stuff フォルダを
-  指定しています。MSVC ランタイムが見つからない場合は、同梱の vc_redist.x64.exe（
-  Microsoft Visual C++ x64 再頒布可能パッケージ）、または上記 Microsoft の URL から
-  入手したものをインストールしてください。
+  指定しています。必要な Visual C++ ランタイム DLL は ppm.exe と同じフォルダにあります。
 
 macOS 15 以降、Apple Silicon:
   tar.gz を展開します（tar -xzf ppm-macos-arm64.tar.gz）。
