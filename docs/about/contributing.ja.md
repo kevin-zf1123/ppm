@@ -94,7 +94,7 @@ export QTDIR="$HOME/Qt/6.12.0/macos"
 cmake --build build --parallel
 ```
 
-`build/ppm.app` ができます。deployment target は Qt の既定値を使いますが、PPM のサポート対象は macOS 15 以降です。
+`build/ppm.app` ができます。deployment target は Qt の既定値を使いますが、PPM のサポート対象は macOS 15 以降です。 macOS がダークモードでも、PPM はライト表示を使います。
 
 ユーザーごとの設定フォルダを作ります。
 

@@ -94,7 +94,7 @@ export QTDIR="$HOME/Qt/6.12.0/macos"
 cmake --build build --parallel
 ```
 
-This creates `build/ppm.app`. The build uses Qt's default deployment target; PPM's supported macOS versions start at 15.
+This creates `build/ppm.app`. The build uses Qt's default deployment target; PPM's supported macOS versions start at 15. PPM currently uses a light appearance even when macOS is in Dark Mode.
 
 Create the per-user configuration directory:
 
