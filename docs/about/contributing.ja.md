@@ -120,10 +120,10 @@ macOS のソースビルドは、起動と設定の読み書きに対応して�
 構成時のコマンドに `-DPPM_BUILD_TESTS=ON` を追加してビルドし、次を実行します。
 
 ```bash
-ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag)_tests$' --output-on-failure
+ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag|confirmation)_tests$' --output-on-failure
 ```
 
-設定ファイルの検索、Stuff フォルダの相対・絶対パス、ユーザー設定の保存先、終了時のカット情報タグの破棄を検証します。GitHub Actions は、Qt 6.12 を使って Windows x64 と macOS arm64 でビルドし、これらのテストを実行します。実際の画面の起動と制作現場のファイルサーバーでの動作は、別途確認が必要です。
+設定ファイルの検索、Stuff フォルダの相対・絶対パス、ユーザー設定の保存先、終了時のカット情報タグの破棄、承認・工程内リテイク操作の確定とキャンセルを検証します。GitHub Actions は、Qt 6.12 を使って Windows x64 と macOS arm64 でビルドし、これらのテストを実行します。実際の画面の起動と制作現場のファイルサーバーでの動作は、別途確認が必要です。
 
 ### CI アプリパッケージのダウンロード
 

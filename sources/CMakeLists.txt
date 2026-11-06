@@ -194,4 +194,17 @@ if(PPM_BUILD_TESTS)
     set_target_properties(ppm_sceneinfotag_tests PROPERTIES AUTOMOC ON)
     target_link_libraries(ppm_sceneinfotag_tests PRIVATE Qt6::Test Qt6::Gui)
     add_test(NAME ppm_sceneinfotag_tests COMMAND ppm_sceneinfotag_tests)
+    add_executable(ppm_confirmation_tests tests/confirmationdialog_test.cpp
+        actionconfirmationdialog.cpp workflow.cpp usersettings.cpp configurationpaths.cpp
+        sceneinfotag.cpp renamescript.cpp googlegateway.cpp googlechatgateway.cpp
+        ${CMAKE_CURRENT_BINARY_DIR}/moc_actionconfirmationdialog.cpp
+        ${CMAKE_CURRENT_BINARY_DIR}/moc_workflow.cpp
+        ${CMAKE_CURRENT_BINARY_DIR}/moc_googlegateway.cpp
+        ${CMAKE_CURRENT_BINARY_DIR}/moc_googlechatgateway.cpp)
+    add_dependencies(ppm_confirmation_tests ppm)
+    set_target_properties(ppm_confirmation_tests PROPERTIES AUTOMOC ON)
+    target_link_libraries(ppm_confirmation_tests PRIVATE Qt6::Test Qt6::Widgets
+        Qt6::Network Qt6::Core5Compat Qt6::Qml)
+    add_test(NAME ppm_confirmation_tests COMMAND ppm_confirmation_tests)
+    set_tests_properties(ppm_confirmation_tests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 30)
 endif()

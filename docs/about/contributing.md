@@ -120,10 +120,10 @@ The macOS source build covers startup and configuration. External application se
 Add `-DPPM_BUILD_TESTS=ON` to the configure command, build, and run:
 
 ```bash
-ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag)_tests$' --output-on-failure
+ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag|confirmation)_tests$' --output-on-failure
 ```
 
-These tests cover configuration lookup, relative and absolute Stuff paths, the per-user settings location, and scene-tag destruction during shutdown. GitHub Actions builds the application and runs these tests on Windows x64 and macOS arm64 with Qt 6.12. Native UI startup and production file-server workflows require separate checks.
+These tests cover configuration lookup, relative and absolute Stuff paths, the per-user settings location, scene-tag destruction during shutdown, and confirming or canceling forward and rewind actions. GitHub Actions builds the application and runs these tests on Windows x64 and macOS arm64 with Qt 6.12. Native UI startup and production file-server workflows require separate checks.
 
 ### Downloading CI application packages
 
