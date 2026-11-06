@@ -2,7 +2,7 @@
 if(NOT IS_DIRECTORY "${BUNDLE}")
     message(FATAL_ERROR "BUNDLE must name the staged application")
 endif()
-set(executable "${BUNDLE}/Contents/MacOS/ppm")
+set(executable "${BUNDLE}/Contents/MacOS/PPM")
 file(GLOB_RECURSE plugins "${BUNDLE}/Contents/PlugIns/*.dylib")
 if(NOT EXISTS "${BUNDLE}/Contents/PlugIns/platforms/libqcocoa.dylib" OR
    NOT EXISTS "${BUNDLE}/Contents/PlugIns/iconengines/libqsvgicon.dylib")

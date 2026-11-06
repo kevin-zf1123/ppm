@@ -94,7 +94,7 @@ export QTDIR="$HOME/Qt/6.12.0/macos"
 cmake --build build --parallel
 ```
 
-`build/ppm.app` ができます。deployment target は Qt の既定値を使いますが、PPM のサポート対象は macOS 15 以降です。 macOS がダークモードでも、PPM はライト表示を使います。
+`build/PPM.app` ができます。deployment target は Qt の既定値を使いますが、PPM のサポート対象は macOS 15 以降です。 macOS がダークモードでも、PPM はライト表示を使います。
 
 ユーザーごとの設定フォルダを作ります。
 
@@ -109,7 +109,7 @@ mkdir -p "$HOME/Library/Application Support/PPM"
 StuffFolderPath=/absolute/path/to/ppm/stuff
 ```
 
-`open build/ppm.app` で起動します。インストールした Qt のライブラリを参照するソースビルドなので、Qt のインストール先を残してください。単体で配布できるアプリではありません。生成される `Contents/Resources/qt.conf` は、その Qt のプラグインを参照します。Xcode など複数の構成に対応するジェネレーターでは、`--config Release` を付けてビルドし、`build/Release/ppm.app` を起動します。どのビルドも同じユーザー用の設定フォルダを使います。
+`open build/PPM.app` で起動します。インストールした Qt のライブラリを参照するソースビルドなので、Qt のインストール先を残してください。単体で配布できるアプリではありません。生成される `Contents/Resources/qt.conf` は、その Qt のプラグインを参照します。Xcode など複数の構成に対応するジェネレーターでは、`--config Release` を付けてビルドし、`build/Release/PPM.app` を起動します。どのビルドも同じユーザー用の設定フォルダを使います。
 
 相対パスの `StuffFolderPath` は、アプリの場所や作業ディレクトリに関係なく `~/Library/Application Support/PPM` を起点に解決します。`/Volumes/anime/PPM/stuff` のようなローカルの絶対パスも使えます。ユーザーごとの設定は `~/Library/Application Support/PPM/usersettings.ini` に保存されます。[Stuff フォルダ](../administration/stuff-folder.ja.md) と [環境設定](../using/preferences.ja.md) も参照してください。
 
@@ -132,7 +132,7 @@ ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag|confirmat
 ダウンロードしたアーティファクトの ZIP を展開し、中のアプリ用アーカイブも展開します。
 
 - `ppm-windows-x64.zip`: `PPM/ppm.exe`、Qt の実行用ライブラリ、同梱の `stuff` フォルダを指定する `conf.ini` が入っています。Visual C++ ランタイム DLL は `ppm.exe` と同じフォルダにあります。
-- `ppm-macos-arm64.tar.gz`: Qt のフレームワークとプラグインを含む `PPM/ppm.app` が入っています。tar アーカイブは実行権限とフレームワークのシンボリックリンクを保持します。上記の手順で `~/Library/Application Support/PPM/conf.ini` を作り、展開した `PPM/stuff` フォルダの絶対パスを指定してください。アプリは ad-hoc 署名付きですが、公証はされていません。信頼できるビルドが macOS にブロックされた場合は、**システム設定 > プライバシーとセキュリティ > このまま開く** で許可します。
+- `ppm-macos-arm64.tar.gz`: Qt のフレームワークとプラグインを含む `PPM/PPM.app` が入っています。tar アーカイブは実行権限とフレームワークのシンボリックリンクを保持します。上記の手順で `~/Library/Application Support/PPM/conf.ini` を作り、展開した `PPM/stuff` フォルダの絶対パスを指定してください。アプリは ad-hoc 署名付きですが、公証はされていません。信頼できるビルドが macOS にブロックされた場合は、**システム設定 > プライバシーとセキュリティ > このまま開く** で許可します。
 
 どちらにもサンプルデータ、ライセンス、英語・日本語マニュアル、ソースのコミットを示す `BUILD.txt` が含まれます。評価用の開発ビルドなので、データのコピーを使ってください。上記の macOS の機能制限は、これらのパッケージにも適用されます。
 

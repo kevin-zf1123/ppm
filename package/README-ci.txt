@@ -18,7 +18,7 @@ macOS 15 or later, Apple Silicon:
     [General]
     StuffFolderPath=/absolute/path/to/PPM/stuff
 
-  Open PPM/ppm.app. The app is ad-hoc signed and not notarized. If macOS blocks
+  Open PPM/PPM.app. The app is ad-hoc signed and not notarized. If macOS blocks
   this trusted build, use System Settings > Privacy & Security > Open Anyway.
   External application launching, ZIP actions, and mixed Windows/macOS shared
   production folders are outside the supported scope of this build.
@@ -41,7 +41,7 @@ macOS 15 以降、Apple Silicon:
   tar.gz を展開します（tar -xzf ppm-macos-arm64.tar.gz）。
   ~/Library/Application Support/PPM/conf.ini を作り、上の例の StuffFolderPath を、
   展開した stuff フォルダの絶対パスに置き換えて記入してください。
-  PPM/ppm.app を起動します。アプリは ad-hoc 署名付きですが、公証はされていません。
+  PPM/PPM.app を起動します。アプリは ad-hoc 署名付きですが、公証はされていません。
   信頼できるビルドが macOS にブロックされた場合は、「システム設定」>
   「プライバシーとセキュリティ」>「このまま開く」で許可します。
   外部アプリの起動、ZIP 操作、Windows と macOS が混在する制作共有フォルダでの

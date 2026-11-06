@@ -111,8 +111,8 @@ def main():
             shutil.copytree(qt_dir / "licenses", package / "stuff/LICENSE/Qt")
 
         if sys.platform == "darwin":
-            bundle = package / "ppm.app"
-            shutil.copytree(build / "ppm.app", bundle, symlinks=True)
+            bundle = package / "PPM.app"
+            shutil.copytree(build / "PPM.app", bundle, symlinks=True)
             # The source build points to the runner's Qt plugins. Deployment
             # must instead use the plugins inside this fresh staging bundle.
             config = bundle / "Contents/Resources/qt.conf"
@@ -132,7 +132,7 @@ def main():
                 repository / ".github/scripts/verify-macos-bundle.cmake")
             run("codesign", "--force", "--deep", "--sign", "-", bundle)
             run("codesign", "--verify", "--deep", "--strict", bundle)
-            executable = bundle / "Contents/MacOS/ppm"
+            executable = bundle / "Contents/MacOS/PPM"
         else:
             executable = package / "ppm.exe"
             shutil.copy2(build / "Release/ppm.exe", executable)

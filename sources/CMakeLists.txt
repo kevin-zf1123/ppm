@@ -134,6 +134,7 @@ if(APPLE)
     target_link_libraries(${PROJECT_NAME} Qt6::Svg)
     set_target_properties(${PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE TRUE
+        OUTPUT_NAME "PPM"
         MACOSX_BUNDLE_BUNDLE_NAME "PPM"
         MACOSX_BUNDLE_GUI_IDENTIFIER "org.opentoonz.ppm"
         MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"

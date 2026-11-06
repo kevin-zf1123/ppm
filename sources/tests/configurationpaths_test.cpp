@@ -108,7 +108,7 @@ private slots:
     QCOMPARE(
         QFileInfo(ConfigurationPaths::userSettingsFilePath()).absolutePath(),
         ConfigurationPaths::configurationDirectory(
-            "/Applications/ppm.app/Contents/MacOS"));
+            "/Applications/PPM.app/Contents/MacOS"));
     QCoreApplication::setApplicationName("PPM");
     QCOMPARE(
         ConfigurationPaths::configurationDirectory(QString()),

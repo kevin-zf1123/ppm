@@ -94,7 +94,7 @@ export QTDIR="$HOME/Qt/6.12.0/macos"
 cmake --build build --parallel
 ```
 
-This creates `build/ppm.app`. The build uses Qt's default deployment target; PPM's supported macOS versions start at 15. PPM currently uses a light appearance even when macOS is in Dark Mode.
+This creates `build/PPM.app`. The build uses Qt's default deployment target; PPM's supported macOS versions start at 15. PPM currently uses a light appearance even when macOS is in Dark Mode.
 
 Create the per-user configuration directory:
 
@@ -109,7 +109,7 @@ Create `~/Library/Application Support/PPM/conf.ini` and set the absolute path to
 StuffFolderPath=/absolute/path/to/ppm/stuff
 ```
 
-Start the application with `open build/ppm.app`. Keep the Qt installation available: this is a source build linked to the installed Qt libraries, not a self-contained distribution. Its generated `Contents/Resources/qt.conf` points to the plugins from that Qt installation. With a multi-configuration generator such as Xcode, build with `--config Release` and start `build/Release/ppm.app`. All builds use the same per-user configuration directory.
+Start the application with `open build/PPM.app`. Keep the Qt installation available: this is a source build linked to the installed Qt libraries, not a self-contained distribution. Its generated `Contents/Resources/qt.conf` points to the plugins from that Qt installation. With a multi-configuration generator such as Xcode, build with `--config Release` and start `build/Release/PPM.app`. All builds use the same per-user configuration directory.
 
 PPM resolves a relative `StuffFolderPath` from `~/Library/Application Support/PPM`, independently of the app location and working directory. An absolute local path such as `/Volumes/anime/PPM/stuff` also works. Per-user settings are stored in `~/Library/Application Support/PPM/usersettings.ini`; see [The Stuff Folder](../administration/stuff-folder.md) and [Preferences](../using/preferences.md).
 
@@ -132,7 +132,7 @@ After a successful **Build** workflow run, open that run in the repository's **A
 Extract the downloaded artifact ZIP, then extract the application archive inside it:
 
 - `ppm-windows-x64.zip`: contains `PPM/ppm.exe`, Qt runtime dependencies, and `conf.ini` pointing to the included `stuff` folder. The Visual C++ runtime DLLs are included next to `ppm.exe`.
-- `ppm-macos-arm64.tar.gz`: contains `PPM/ppm.app` with Qt frameworks and plugins. The tar archive preserves executable permissions and framework symlinks. Configure `~/Library/Application Support/PPM/conf.ini` as described above, using the absolute path to the extracted `PPM/stuff` folder. The app has an ad-hoc signature and is not notarized. If macOS blocks a build you trust, allow it in **System Settings > Privacy & Security > Open Anyway**.
+- `ppm-macos-arm64.tar.gz`: contains `PPM/PPM.app` with Qt frameworks and plugins. The tar archive preserves executable permissions and framework symlinks. Configure `~/Library/Application Support/PPM/conf.ini` as described above, using the absolute path to the extracted `PPM/stuff` folder. The app has an ad-hoc signature and is not notarized. If macOS blocks a build you trust, allow it in **System Settings > Privacy & Security > Open Anyway**.
 
 Both packages include sample data, license files, English and Japanese manuals, and `BUILD.txt` identifying the source commit. These are development builds for evaluation with copies of your data. The macOS feature limitations listed above also apply to these packages.
 
