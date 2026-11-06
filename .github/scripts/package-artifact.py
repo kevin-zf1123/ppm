@@ -70,14 +70,19 @@ def smoke_test(executable, qt_dir, temporary):
             except subprocess.TimeoutExpired:
                 print("Native application stayed running for five seconds.", flush=True)
                 if sys.platform == "win32":
-                    subprocess.run(
+                    module_paths = subprocess.check_output(
                         ["pwsh", "-NoProfile", "-Command",
-                         f"$loaded = (Get-Process -Id {process.pid} -ErrorAction Stop).Modules.FileName; "
-                         "foreach ($name in 'msvcp140.dll','vcruntime140.dll') { "
-                         "if ($loaded -notcontains (Join-Path $PWD $name)) { "
-                         'throw "Application-local $name was not loaded" } }'],
-                        cwd=executable.parent, check=True,
-                    )
+                         f"(Get-Process -Id {process.pid} -ErrorAction Stop).Modules "
+                         "| ForEach-Object { $_.FileName }"],
+                        text=True,
+                    ).splitlines()
+                    for name in ("msvcp140.dll", "vcruntime140.dll"):
+                        loaded = [Path(path) for path in module_paths
+                                  if Path(path).name.lower() == name]
+                        expected = executable.parent / name
+                        if len(loaded) != 1 or not expected.samefile(loaded[0]):
+                            raise RuntimeError(f"Expected {expected}, loaded {loaded}")
+                        print(f"Verified application-local {name}: {loaded[0]}", flush=True)
             else:
                 raise RuntimeError(f"Application exited during startup: {code}")
         finally:
