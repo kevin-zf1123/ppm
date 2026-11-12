@@ -1,4 +1,5 @@
 #include "mywindow.h"
+#include "platform.h"
 #include "usersettingspopup.h"
 #include "actionconfirmationdialog.h"
 #include "usersettings.h"
@@ -50,6 +51,9 @@
 #include <QFutureWatcher>
 #include <QPointer>
 #include <QAction>
+#ifdef Q_OS_MACOS
+#include <QMenuBar>
+#endif
 #include <QImage>
 #include <QPixmap>
 #include <algorithm>
@@ -227,8 +231,7 @@ const QString ColumnVisibilityKey_Episode          = "Episode";
 const QString ColumnVisibilityKey_LastModifiedDate = "LastModifiedDate";
 const QString ColumnVisibilityKey_Information      = "Information";
 
-MyTable::MyTable(QWidget* parent)
-    : QTableWidget(0, 0, parent), m_process(new QProcess(this)) {
+MyTable::MyTable(QWidget* parent) : QTableWidget(0, 0, parent) {
   QStringList labels;
   labels << ""  // まとめて承認ボタンの列
          << tr("Open")
@@ -1055,16 +1058,16 @@ void MyTable::onOpenButtonClicked() {
     // OpenToonzの引数は、ファイルのパスの前に渡す。
     // QProcess::startDetached()はprogram全体を実行ファイルのパスとして扱うため、
     // 引数はprogramに連結せず、argumentsに分けて入れる（"..."で囲んだ空白入りの引数も扱える）
-    if (path.endsWith(".tnz") &&
+    const bool isToonzScene = path.endsWith(".tnz");
+    if (isToonzScene &&
         !UserSettings::instance()->getOpenToonzArgument().trimmed().isEmpty()) {
       arguments << QProcess::splitCommand(
           UserSettings::instance()->getOpenToonzArgument());
     }
-    arguments << QDir::toNativeSeparators(path);
-
-    // QProcess * myProcess = new QProcess(this);
-    // m_process->start(program, arguments);
-    if (!QProcess::startDetached(program, arguments)) {
+    const auto mode = isToonzScene ? Platform::OpenMode::CommandLine
+                                   : Platform::OpenMode::Document;
+    if (!Platform::openFile(program, QDir::toNativeSeparators(path), mode,
+                            arguments)) {
       showStartProgramFailedMessage(program, path);
       return;
     }
@@ -1094,10 +1097,7 @@ void MyTable::onOpenXdtsButtonClicked() {
       showOpenWithDefaultAppFailedMessage(path);
     return;
   }
-  QStringList arguments;
-  arguments << path;
-  // m_process->start(program, arguments);
-  if (!QProcess::startDetached(program, arguments))
+  if (!Platform::openFile(program, path, Platform::OpenMode::CommandLine))
     showStartProgramFailedMessage(program, path);
 }
 
@@ -2029,11 +2029,37 @@ MyWindow::MyWindow() : m_projectSettingsDialog(nullptr) {
   m_registerButton = new QPushButton(tr("Register"), this);
   m_retakeButton   = new QPushButton(tr("Retake"), this);
 
+#ifdef Q_OS_MACOS
+  auto* menuBar = new QMenuBar(this);
+  auto* project = menuBar->addMenu(tr("Project"));
+  // Cocoa moves these two roles into the application menu.
+  auto* about = new QAction(tr("About PPM"), project);
+  about->setMenuRole(QAction::AboutRole);
+  project->addAction(about);
+  connect(about, &QAction::triggered, this, &MyWindow::onAboutTriggered);
+  auto* preferences = new QAction(tr("Preferences"), project);
+  preferences->setMenuRole(QAction::PreferencesRole);
+  preferences->setShortcut(QKeySequence::Preferences);
+  project->addAction(preferences);
+  connect(preferences, &QAction::triggered, m_userSettingsPopup,
+          &QDialog::exec);
+
+  auto* settings = project->addMenu(tr("Project Settings"));
+  settings->menuAction()->setMenuRole(QAction::NoRole);
+  const QStringList categories = ProjectSettingsDialog::categoryNames();
+  for (int row = 0; row < categories.size(); ++row) {
+    settings->addAction(categories.at(row), this,
+                        [this, row] { openProjectSettings(row); });
+  }
+#else
   m_openSettingsButton =
       new QPushButton(QIcon(":Resources/gear.svg"), "", this);
   m_openSettingsButton->setFixedSize(23, 23);
   m_openSettingsButton->setIconSize(QSize(18, 18));
   m_openSettingsButton->setToolTip(tr("Project Settings / Preferences"));
+  connect(m_openSettingsButton, &QPushButton::clicked, this,
+          &MyWindow::onSettingsButtonClicked);
+#endif
 
   m_sceneSearchEdit = new QLineEdit(this);
   m_sceneSearchEdit->setPlaceholderText(tr("Scene Number"));
@@ -2171,9 +2197,6 @@ MyWindow::MyWindow() : m_projectSettingsDialog(nullptr) {
   connect(m_episodeCombo, SIGNAL(currentIndexChanged(int)), this,
           SLOT(onCurrentEpisodeChanged()));
 
-  connect(m_openSettingsButton, SIGNAL(clicked()), this,
-          SLOT(onSettingsButtonClicked()));
-
   // 前回開いていたプロジェクトが見つからない場合はm_prjComboの選択が先頭項目にフォールバックしているため、
   // WorkflowManager::currentProjectName()ではなくm_prjComboの実際の選択内容を使う
   onCurrentPrjChanged(m_prjCombo->currentText());
@@ -2206,7 +2229,9 @@ void MyWindow::rebuildTopControlsLayout() {
   projectLay->addWidget(m_viewModeToggleButton, 0);
   projectLay->addWidget(m_projectLabel, 0);
   projectLay->addWidget(m_prjCombo, 1);
+#ifndef Q_OS_MACOS
   projectLay->addWidget(m_openSettingsButton, 0);
+#endif
 
   // グループC：更新／登録／リテイクの各ボタン
   QHBoxLayout* buttonLay = new QHBoxLayout();
@@ -3303,6 +3328,7 @@ void MyWindow::applySavedProjectSettings(const QString& newPrjName) {
   refreshList();
 }
 
+#ifndef Q_OS_MACOS
 void MyWindow::onSettingsButtonClicked() {
   QMenu menu(this);
   QAction* projectSettingsAction = menu.addAction(tr("Project Settings"));
@@ -3318,12 +3344,19 @@ void MyWindow::onSettingsButtonClicked() {
     onAboutTriggered();
 }
 
-void MyWindow::openProjectSettings() {
+#endif
+
+void MyWindow::openProjectSettings(int category) {
   if (!m_projectSettingsDialog)
     m_projectSettingsDialog = new ProjectSettingsDialog(this);
 
+  if (m_projectSettingsDialog->isVisible()) {
+    if (category >= 0) m_projectSettingsDialog->selectCategory(category);
+    m_projectSettingsDialog->raise();
+    return;
+  }
   m_projectSettingsDialog->refresh();
-
+  if (category >= 0) m_projectSettingsDialog->selectCategory(category);
   m_projectSettingsDialog->exec();
 
   // Saveボタンでは閉じずに保存できるようになったため、ダイアログはCloseで閉じられる度に

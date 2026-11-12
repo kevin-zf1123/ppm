@@ -12,7 +12,6 @@
 #include <QCheckBox>
 #include "workflow.h"
 
-class QProcess;
 class QButtonGroup;
 class UserSettingsPopup;
 class QComboBox;
@@ -69,7 +68,6 @@ private:
 
 class MyTable : public QTableWidget {
   Q_OBJECT
-  QProcess* m_process;
 
   // チェックボックスが１つだけONのときはfalseを返し、
   // 通常のonActionButtonClickedの処理を続ける
@@ -251,8 +249,11 @@ class MyWindow : public QWidget {
   QPushButton* m_refreshButton;
   QPushButton* m_registerButton;
   QPushButton* m_retakeButton;
+#ifndef Q_OS_MACOS
+  void onSettingsButtonClicked();
   QPushButton* m_openSettingsButton;  // 歯車アイコン。クリックするとProject
                                       // Settings/Preferencesのメニューを出す
+#endif
   QLineEdit* m_sceneSearchEdit;
   QPushButton* m_sceneSearchButton;  // 虫眼鏡アイコン
 
@@ -312,10 +313,8 @@ public slots:
   void onReloadButtonClicked(int);
   // カット登録・リテイクでカットの所属が変わった工程グループの詳細進捗を作り直す
   void onFlowGroupsChanged(const QList<FlowGroupId>& fgIds);
-  void openProjectSettings();
+  void openProjectSettings(int category = -1);
   void onViewModeToggled();
-  void onSettingsButtonClicked();  // 歯車アイコン：Project
-                                   // Settings/Preferencesのメニューを出す
   void onSceneSearchClicked();
   void onAboutTriggered();
 };

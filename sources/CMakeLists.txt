@@ -25,6 +25,7 @@ set(MOC_HEADERS
 set(HEADERS
     ${MOC_HEADERS}
     configurationpaths.h
+    platform.h
     workflowtypes.h
     renamescript.h
     sceneinfotag.h
@@ -34,6 +35,7 @@ set(HEADERS
 set(SOURCES
 main.cpp
 configurationpaths.cpp
+platform.cpp
 mywindow.cpp
 workflow.cpp
 usersettingspopup.cpp
@@ -93,6 +95,7 @@ qt6_add_resources(SOURCES ${RESOURCES})
 set(LANGUAGES ja)
 # 翻訳対象のファイルを設定する。
 SET(TRANSLATION_TARGET_FILES
+    translations/macos_menu.cpp
     ${HEADERS}
     ${SOURCES}
 )
@@ -128,6 +131,8 @@ set(SOURCES
 add_executable(${PROJECT_NAME} WIN32 ${HEADERS} ${SOURCES} ${RESOURCES} ${RC_FILE})
 
 if(APPLE)
+    set_source_files_properties(macos/ppm.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    target_sources(${PROJECT_NAME} PRIVATE macos/ppm.icns)
     # The UI uses SVG icons. Resolve plugins from the same Qt installation as
     # the linked libraries, including when a global plugin directory exists.
     find_package(Qt6 REQUIRED COMPONENTS Svg)
@@ -136,6 +141,7 @@ if(APPLE)
         MACOSX_BUNDLE TRUE
         OUTPUT_NAME "PPM"
         MACOSX_BUNDLE_BUNDLE_NAME "PPM"
+        MACOSX_BUNDLE_ICON_FILE "ppm.icns"
         MACOSX_BUNDLE_GUI_IDENTIFIER "org.opentoonz.ppm"
         MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
@@ -180,8 +186,8 @@ if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
     endif()
 endif()
 
-# Focused startup tests are opt-in for developer builds.
-option(PPM_BUILD_TESTS "Build startup behavior tests" OFF)
+# Focused behavior tests are opt-in for developer builds.
+option(PPM_BUILD_TESTS "Build application behavior tests" OFF)
 if(PPM_BUILD_TESTS)
     enable_testing()
     find_package(Qt6 REQUIRED COMPONENTS Test)
@@ -196,7 +202,7 @@ if(PPM_BUILD_TESTS)
     target_link_libraries(ppm_sceneinfotag_tests PRIVATE Qt6::Test Qt6::Gui)
     add_test(NAME ppm_sceneinfotag_tests COMMAND ppm_sceneinfotag_tests)
     add_executable(ppm_confirmation_tests tests/confirmationdialog_test.cpp
-        actionconfirmationdialog.cpp workflow.cpp usersettings.cpp configurationpaths.cpp
+        actionconfirmationdialog.cpp workflow.cpp usersettings.cpp configurationpaths.cpp platform.cpp
         sceneinfotag.cpp renamescript.cpp googlegateway.cpp googlechatgateway.cpp
         ${CMAKE_CURRENT_BINARY_DIR}/moc_actionconfirmationdialog.cpp
         ${CMAKE_CURRENT_BINARY_DIR}/moc_workflow.cpp
@@ -208,4 +214,10 @@ if(PPM_BUILD_TESTS)
         Qt6::Network Qt6::Core5Compat Qt6::Qml)
     add_test(NAME ppm_confirmation_tests COMMAND ppm_confirmation_tests)
     set_tests_properties(ppm_confirmation_tests PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 30)
+    if(APPLE)
+        add_executable(ppm_macos_operations_tests tests/macos_operations_test.cpp platform.cpp)
+        set_target_properties(ppm_macos_operations_tests PROPERTIES AUTOMOC ON)
+        target_link_libraries(ppm_macos_operations_tests PRIVATE Qt6::Test)
+        add_test(NAME ppm_macos_operations_tests COMMAND ppm_macos_operations_tests)
+    endif()
 endif()
