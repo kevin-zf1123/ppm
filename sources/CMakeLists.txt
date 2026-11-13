@@ -24,6 +24,7 @@ set(MOC_HEADERS
 
 set(HEADERS
     ${MOC_HEADERS}
+    pathmapping.h
     configurationpaths.h
     platform.h
     workflowtypes.h
@@ -34,6 +35,7 @@ set(HEADERS
 
 set(SOURCES
 main.cpp
+pathmapping.cpp
 configurationpaths.cpp
 platform.cpp
 mywindow.cpp
@@ -202,7 +204,7 @@ if(PPM_BUILD_TESTS)
     target_link_libraries(ppm_sceneinfotag_tests PRIVATE Qt6::Test Qt6::Gui)
     add_test(NAME ppm_sceneinfotag_tests COMMAND ppm_sceneinfotag_tests)
     add_executable(ppm_confirmation_tests tests/confirmationdialog_test.cpp
-        actionconfirmationdialog.cpp workflow.cpp usersettings.cpp configurationpaths.cpp platform.cpp
+        actionconfirmationdialog.cpp workflow.cpp usersettings.cpp configurationpaths.cpp platform.cpp pathmapping.cpp
         sceneinfotag.cpp renamescript.cpp googlegateway.cpp googlechatgateway.cpp
         ${CMAKE_CURRENT_BINARY_DIR}/moc_actionconfirmationdialog.cpp
         ${CMAKE_CURRENT_BINARY_DIR}/moc_workflow.cpp
