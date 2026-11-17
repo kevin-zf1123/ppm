@@ -443,7 +443,7 @@ void MyTable::simpleSearch(FlowGroupId fgId) {
     for (auto protocol : wf.protocols) {
       // 条件パスを取得
       QString conditionPathBase = WorkflowManager::instance()->decodePathMacros(
-          protocol.conditionPath, true);
+          protocol.conditionPath);
       // 条件パスをデコード
       // PREFIX and EPISODE; resolve ROOT with the per-scene path.
 
@@ -565,11 +565,8 @@ DoRefreshResult doRefreshWorkItem(const DoRefreshWorkItem& item) {
     bool found = false;
     for (auto searchConditionPath : searchConditionPaths) {
       // 存在する場合
-      auto* manager          = WorkflowManager::instance();
-      const QString resolved = manager->decodeObfuscatedPathMacros(
-          searchConditionPath, info.sequence, info.sceneNumber);
-      const QString actual = SharedFiles::actualPath(resolved);
-      if (!resolved.isEmpty() && actual.isEmpty()) {
+      const QString actual = SharedFiles::actualPath(searchConditionPath);
+      if (!searchConditionPath.isEmpty() && actual.isEmpty()) {
         result.ambiguous = true;
         return result;
       }

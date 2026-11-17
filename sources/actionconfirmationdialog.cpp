@@ -525,7 +525,7 @@ QWidget* StepExecutor_Rename::createWidget() {
   int i = 0;
   for (auto orgPath : m_orgPaths) {
     QString shortenOrgPath =
-        WorkflowManager::instance()->relativePathFromProjectRoot(hide(orgPath));
+        WorkflowManager::instance()->relativePathFromProjectRoot(orgPath);
 
     QString txt;
     if (!m_isUndo) {
@@ -591,12 +591,7 @@ bool StepExecutor_Rename::execute_rename(QString& log, QVariant& checkSum) {
   bool ok = true;
   QList<QVariant> checkSumList;
   for (int j = 0; j < m_orgPaths.size(); j++) {
-    m_orgPaths[j] = SharedFiles::actualPath(m_orgPaths[j]);
-    if (!QFileInfo(m_orgPaths[j]).isFile()) {
-      log += tr("Ambiguous or missing source file.\n");
-      return false;
-    }
-    log.append(tr("[RENAME]\nFrom: %1\n").arg(hide(m_orgPaths[j])));
+    log.append(tr("[RENAME]\nFrom: %1\n").arg(m_orgPaths[j]));
 
     QMessageBox::StandardButton owRet = QMessageBox::Cancel;
 
@@ -611,12 +606,8 @@ bool StepExecutor_Rename::execute_rename(QString& log, QVariant& checkSum) {
 
       log.append(tr("To: %1\n").arg(copyTo));
 
-      if (copyToReal.isEmpty() ||
-          SharedFiles::sameEntry(m_orgPaths[j], copyToReal)) {
-        log += tr("Ambiguous source or destination.\n");
-        return false;
-      }
-      if (QFileInfo(copyToReal).isFile()) {
+      QFileInfo fi(copyToReal);
+      if (fi.dir().entryList(QDir::Files).contains(fi.fileName())) {
         // if (QFile::exists(copyTo)) { //←本当はシンプルにこちらにしたいが、
         // 正しくファイルの有無を読み取ってくれないようなので書き換えた
         log.append(tr("  Remove existing file: "));
@@ -642,6 +633,8 @@ bool StepExecutor_Rename::execute_rename(QString& log, QVariant& checkSum) {
           log.append(tr("Done.\n"));
       }
 
+      std::cout << "copy from " << m_orgPaths[j].toStdString() << " to "
+                << copyTo.toStdString() << std::endl;
       log.append(tr("  Copy file: "));
       ok = createPathAndCopyFile(m_orgPaths[j], copyToReal, log);
       // std::cout << "copied = " <<
@@ -673,6 +666,7 @@ bool StepExecutor_Rename::execute_undo(QString& log) {
   bool ok                      = true;
   int i                        = 0;
   for (auto orgPath : m_orgPaths) {
+    std::cout << "orgPath = " << orgPath.toStdString() << std::endl;
     QString revertFromPath;
     // 復帰元のパスを決める
     //  revertFromPathは表示・ログ用（難読化マクロのまま）。ファイル操作には、デコードして使う
@@ -692,23 +686,17 @@ bool StepExecutor_Rename::execute_undo(QString& log) {
 
     log.append(tr("[UNDO_RENAME]\nFrom: %1\nTo: %2\n")
                    .arg(revertFromPath)
-                   .arg(hide(orgPath)));
+                   .arg(orgPath));
 
-    orgPath = SharedFiles::actualPath(orgPath);
-    if (!QFileInfo(realRenameTo(i, revertFromPath)).isFile() ||
-        orgPath.isEmpty() ||
-        SharedFiles::sameEntry(orgPath, realRenameTo(i, revertFromPath))) {
-      log += tr("Ambiguous source or destination.\n");
-      return false;
-    }
-    if (QFileInfo(orgPath).isFile()) {
+    QFileInfo fi(orgPath);
+    if (fi.dir().entryList(QDir::Files).contains(fi.fileName())) {
       // if (QFile::exists(orgPath)) { //←本当はシンプルにこちらにしたいが、
       // 正しくファイルの有無を読み取ってくれないようなので書き換えた
       log.append(tr("  Removing original file: \n"));
       QMessageBox::StandardButton ret = QMessageBox::question(
           nullptr, tr("Question"),
           tr("The file %1 already exists.\nDo you want to overwrite it?")
-              .arg(hide(orgPath)),
+              .arg(orgPath),
           {QMessageBox::Yes | QMessageBox::Cancel}, QMessageBox::Yes);
       if (ret == QMessageBox::Cancel) {
         log.append(tr("Canceled.\n"));
@@ -783,7 +771,7 @@ StepExecutor_Copy::StepExecutor_Copy(const ActionStep& step, QString orgPath,
 
 QWidget* StepExecutor_Copy::createWidget() {
   QString shortenOrgPath =
-      WorkflowManager::instance()->relativePathFromProjectRoot(hide(m_orgPath));
+      WorkflowManager::instance()->relativePathFromProjectRoot(m_orgPath);
 
   QWidget* widget = new QWidget();
 
@@ -842,12 +830,7 @@ bool StepExecutor_Copy::execute(QString& log, QVariant& checkSum) {
 }
 
 bool StepExecutor_Copy::execute_copy(QString& log, QVariant& checkSum) {
-  m_orgPath = SharedFiles::actualPath(m_orgPath);
-  if (!QFileInfo::exists(m_orgPath)) {
-    log += tr("Ambiguous or missing source file.\n");
-    return false;
-  }
-  log.append(tr("[COPY]\nFrom: %1\n").arg(hide(m_orgPath)));
+  log.append(tr("[COPY]\nFrom: %1\n").arg(m_orgPath));
 
   // コピー元がフォルダの場合は、内容ごとコピーする
   if (QFileInfo(m_orgPath).isDir()) {
@@ -872,10 +855,6 @@ bool StepExecutor_Copy::execute_copy(QString& log, QVariant& checkSum) {
 
     log.append(tr("To: %1\n").arg(copyTo));
 
-    if (copyToReal.isEmpty() || SharedFiles::sameEntry(m_orgPath, copyToReal)) {
-      log += tr("Ambiguous source or destination.\n");
-      return false;
-    }
     if (QFile::exists(copyToReal)) {
       log.append(tr("  Remove existing file: "));
 
@@ -900,6 +879,8 @@ bool StepExecutor_Copy::execute_copy(QString& log, QVariant& checkSum) {
         log.append(tr("Done.\n"));
     }
 
+    std::cout << "copy from " << m_orgPath.toStdString() << " to "
+              << copyTo.toStdString() << std::endl;
     log.append(tr("  Copy file: "));
     ok = createPathAndCopyFile(m_orgPath, copyToReal, log);
     // std::cout << "copied = " <<
@@ -1380,7 +1361,7 @@ QWidget* StepExecutor_CopyFolderContents::createWidget() {
 }
 
 QWidget* StepExecutor_CopyFolderContents::createWidget_do() {
-  QString shortenOrgFolderPath(hide(m_orgFolderPath));
+  QString shortenOrgFolderPath(m_orgFolderPath);
   shortenOrgFolderPath.remove(WorkflowManager::instance()->projectRootPath(),
                               Qt::CaseInsensitive);
 
@@ -1594,7 +1575,7 @@ QWidget* StepExecutor_CopyFolderContents::createWidget_undo() {
     if (m_options.move)
       rightLayout->addWidget(
           new QLabel(tr("And the above files / folders will be reverted to %1")
-                         .arg(hide(m_orgFolderPath)),
+                         .arg(m_orgFolderPath),
                      widget),
           0, Qt::AlignLeft);
     if (showWarning)
@@ -1784,11 +1765,9 @@ bool StepExecutor_CopyFolderContents::execute_do(QString& log,
                                                  QVariant& checkSum) {
   const bool isMove = m_options.move;
   if (!isMove)
-    log.append(
-        tr("[COPY FOLDER CONTENTS]\nFrom: %1\n").arg(hide(m_orgFolderPath)));
+    log.append(tr("[COPY FOLDER CONTENTS]\nFrom: %1\n").arg(m_orgFolderPath));
   else
-    log.append(
-        tr("[MOVE FOLDER CONTENTS]\nFrom: %1\n").arg(hide(m_orgFolderPath)));
+    log.append(tr("[MOVE FOLDER CONTENTS]\nFrom: %1\n").arg(m_orgFolderPath));
 
   if (m_options.hasConflictingOptions()) {
     log.append(
@@ -2079,8 +2058,8 @@ bool StepExecutor_CopyFolderContents::execute_do(QString& log,
   QVariantList moveMapping;
   QStringList removedSourceDirs;
   if (isMove) {
-    log.append(tr("Start removing original files from %1.\n")
-                   .arg(hide(m_orgFolderPath)));
+    log.append(
+        tr("Start removing original files from %1.\n").arg(m_orgFolderPath));
     // Undoで元に戻せるよう、元のパスとコピー先のパスの対応表を記録する
     for (const PlanItem& item : plan) {
       // コピーされなかった（同名ファイルのスキップ等）ものは、元の場所に残す
@@ -2161,7 +2140,7 @@ bool StepExecutor_CopyFolderContents::execute_undo(QString& log,
   // ファイルの復帰
   if (m_options.move) {
     QString orgFolderPath = realPath(m_orgFolderPath);
-    log.append(tr("Start reverting files to %1.\n").arg(hide(m_orgFolderPath)));
+    log.append(tr("Start reverting files to %1.\n").arg(m_orgFolderPath));
     if (orgFolderPath.isEmpty()) {
       log += tr("Ambiguous or empty file path.\n");
       return false;
@@ -2403,10 +2382,6 @@ bool StepExecutor_RenameFile::execute_rename(QString& log, QVariant& checkSum) {
   // コピー元・コピー先の難読化マクロは、操作に使うここで、実際のパスにデコードする
   // （表示・ログには、マクロのままのm_renameFrom/m_renameToListを使う）
   const QString renameFromReal = realPath(m_renameFrom);
-  if (!QFileInfo::exists(renameFromReal)) {
-    log += tr("Ambiguous or empty file path.\n");
-    return false;
-  }
 
   // Copyモードでコピー元がフォルダの場合は、内容ごとコピーする
   // （Renameモードのフォルダ移動は対象外）
@@ -2430,11 +2405,6 @@ bool StepExecutor_RenameFile::execute_rename(QString& log, QVariant& checkSum) {
 
     log.append(tr("To: %1\n").arg(copyTo));
 
-    if (copyToReal.isEmpty() ||
-        SharedFiles::sameEntry(renameFromReal, copyToReal)) {
-      log += tr("Ambiguous source or destination.\n");
-      return false;
-    }
     if (QFile::exists(copyToReal)) {
       log.append(tr("  Remove existing file: "));
 
@@ -2459,6 +2429,8 @@ bool StepExecutor_RenameFile::execute_rename(QString& log, QVariant& checkSum) {
         log.append(tr("Done.\n"));
     }
 
+    std::cout << "copy from " << m_renameFrom.toStdString() << " to "
+              << copyTo.toStdString() << std::endl;
     log.append(tr("  Copy file: "));
 
     ok = createPathAndCopyFile(renameFromReal, copyToReal, log);
@@ -2512,12 +2484,6 @@ bool StepExecutor_RenameFile::execute_undo(QString& log) {
                    .arg(revertTo));
 
     const QString revertToReal = realPath(revertTo);
-    if (!QFileInfo(realPath(revertFromPath)).isFile() ||
-        revertToReal.isEmpty() ||
-        SharedFiles::sameEntry(realPath(revertFromPath), revertToReal)) {
-      log += tr("Ambiguous source or destination.\n");
-      return false;
-    }
     if (QFile::exists(revertToReal)) {
       log.append(tr("  Removing original file: \n"));
       QMessageBox::StandardButton ret = QMessageBox::question(
@@ -2802,12 +2768,7 @@ QWidget* StepExecutor_CheckExistence::createWidget() {
 }
 
 bool StepExecutor_CheckExistence::execute(QString& log, QVariant& checkSum) {
-  if (!m_isUndo && m_target == File)
-    for (const QString& path : m_filesToBeChecked)
-      if (!path.isEmpty() && realPath(path).isEmpty()) {
-        log += tr("Ambiguous or empty file path.\n");
-        return false;
-      }
+  // do nothing
   return true;
 }
 
@@ -3774,10 +3735,6 @@ bool StepExecutor_CreateEmptyFolder::execute(QString& log, QVariant& checkSum) {
     }
     // 操作には、難読化マクロをデコードした実際のパスを使う（ログには、マクロのままのパスを使う）
     const QString folderPathReal = realPath(m_folderPath);
-    if (folderPathReal.isEmpty()) {
-      log += tr("Ambiguous or empty file path.\n");
-      return false;
-    }
 
     // もしフォルダが存在しない、または空でなければ何もしない
     QDir dir(folderPathReal);
@@ -3794,7 +3751,7 @@ bool StepExecutor_CreateEmptyFolder::execute(QString& log, QVariant& checkSum) {
       log.append(tr("Done.\n"));
     else
       log.append(tr("Failed.\n"));
-    return ok;
+    return true;
   } else {
     log.append(tr("[CREATE EMPTY FOLDER]\n"));
     // 操作には、難読化マクロをデコードした実際のパスを使う（ログには、マクロのままのパスを使う）
@@ -3971,7 +3928,7 @@ QWidget* StepExecutor_DougaRetakeRouting::createWidget() {
 bool StepExecutor_DougaRetakeRouting::execute(QString& log,
                                               QVariant& checkSum) {
   if (!m_isUndo) {
-    log.append(tr("[DOUGA_RETAKE]\nRename From: %1\n").arg(hide(m_orgPath)));
+    log.append(tr("[DOUGA_RETAKE]\nRename From: %1\n").arg(m_orgPath));
 
     QString cueFileName = m_retakeWidget->getCueFileName();
     QString renameToPath =
@@ -3979,12 +3936,8 @@ bool StepExecutor_DougaRetakeRouting::execute(QString& log,
     log.append(tr("To: %1\n").arg(cueFileName));
 
     bool ok = true;
-    renameToPath = SharedFiles::actualPath(renameToPath);
-    if (renameToPath.isEmpty() || QFileInfo::exists(renameToPath)) {
-      log += tr("Ambiguous or occupied destination.\n");
-      return false;
-    }
-    {
+    QFileInfo fi(renameToPath);
+    if (!fi.dir().entryList(QDir::Files).contains(fi.fileName())) {
       log.append(tr("  Copy file: "));
       ok = createPathAndCopyFile(m_orgPath, renameToPath, log);
     }
@@ -4008,12 +3961,8 @@ bool StepExecutor_DougaRetakeRouting::execute(QString& log,
     log.append(tr("[UNDO_DOUGA_RETAKE]\nRename From: %1\nTo: %2\n")
                    .arg(pathList[1])
                    .arg(pathList[0]));
-    pathList[0] = SharedFiles::actualPath(pathList[0]);
-    if (pathList[0].isEmpty() || QFileInfo::exists(pathList[0])) {
-      log += tr("Ambiguous or occupied destination.\n");
-      return false;
-    }
-    {
+    QFileInfo fi(pathList[0]);
+    if (!fi.dir().entryList(QDir::Files).contains(fi.fileName())) {
       log.append(tr("  Copy file: "));
       if (!createPathAndCopyFile(pathList[1], pathList[0], log)) {
         log.append(tr("Failed.\n"));
@@ -4058,7 +4007,7 @@ QWidget* StepExecutor_ZipFolder::createWidget() {
   QString txt;
   if (!m_isUndo) {
     txt = tr("%1\n\nwill be ZIPed to the following path:\n\n%2")
-              .arg(hide(m_orgFolderPath))
+              .arg(m_orgFolderPath)
               .arg(m_zipFilePath);
   } else {  // undo case
     txt = tr("The following file will be removed:\n\n%1").arg(m_zipFilePath);
@@ -4077,7 +4026,7 @@ QWidget* StepExecutor_ZipFolder::createWidget() {
 bool StepExecutor_ZipFolder::execute(QString& log, QVariant& checkSum) {
   if (!m_isUndo) {
     log.append(tr("[ZIP FOLDER]\nFrom: %1\nTo: %2")
-                   .arg(hide(m_orgFolderPath))
+                   .arg(m_orgFolderPath)
                    .arg(m_zipFilePath));
 
     // 操作に使うここで、難読化マクロをデコードして、実際のパスにする（画面・ログには、マクロのままのパスを使う）

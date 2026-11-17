@@ -1,5 +1,5 @@
-#include "sharedfiles.h"
 #include "registerscenedialog.h"
+#include "sharedfiles.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -310,10 +310,7 @@ void RegisterSceneDialog::onRegisterClicked() {
   }
   WorkflowProtocol protocol = wf.protocols.at(protocolIndex);
 
-  auto* manager             = WorkflowManager::instance();
-  const QString displayPath = computeDestinationPath();
-  QString destPath          = SharedFiles::actualPath(
-      manager->decodeObfuscatedPathMacros(displayPath, sequence, cutName));
+  QString destPath = SharedFiles::actualPath(computeDestinationPath());
   if (destPath.isEmpty()) {
     QMessageBox::warning(
         this, tr("Warning"),
@@ -329,7 +326,8 @@ void RegisterSceneDialog::onRegisterClicked() {
                            tr("Please specify an existing source file."));
       return;
     }
-    if (SharedFiles::sameEntry(sourcePath, destPath)) {
+    if (QFileInfo(sourcePath).absoluteFilePath() ==
+        QFileInfo(destPath).absoluteFilePath()) {
       QMessageBox::warning(
           this, tr("Warning"),
           tr("The source file and the destination cue file are the same."));
@@ -352,11 +350,11 @@ void RegisterSceneDialog::onRegisterClicked() {
                         .arg(cutName, targetGroupInfo.labelName, wf.name);
   if (copyMethod)
     summary += tr("\nThe cue file will be created by copying:\n  %1\n  -> %2")
-                   .arg(sourcePath, displayPath);
+                   .arg(sourcePath, destPath);
   else {
     bool isFolder = QFileInfo(destPath).suffix().isEmpty();
     summary += tr("\nAn empty %1 will be created:\n  %2")
-                   .arg(isFolder ? tr("folder") : tr("file"), displayPath);
+                   .arg(isFolder ? tr("folder") : tr("file"), destPath);
   }
   // 同じ名前のキューファイルが既にある場合
   // コピーの場合は上書きする。空のファイル／フォルダの場合は既存のものを残す
@@ -365,12 +363,12 @@ void RegisterSceneDialog::onRegisterClicked() {
     if (copyMethod)
       summary += tr("\n\n[WARNING] The file %1 already exists. "
                     "It will be overwritten.")
-                     .arg(displayPath);
+                     .arg(destPath);
     else
       summary +=
           tr("\n\nThe %1 %2 already exists. It will be kept as it is.")
               .arg(QFileInfo(destPath).isDir() ? tr("folder") : tr("file"),
-                   displayPath);
+                   destPath);
   }
   QLabel* summaryLabel = new QLabel(summary, &confirmDialog);
   summaryLabel->setWordWrap(true);
@@ -478,10 +476,9 @@ void RegisterSceneDialog::onRegisterClicked() {
   // ⑤ キューファイルの作成／コピー
   QDir destDir = QFileInfo(destPath).dir();
   if (!destDir.exists() && !destDir.mkpath(".")) {
-    QMessageBox::critical(this, tr("Error"),
-                          tr("Failed to create the folder %1.")
-                              .arg(manager->hideObfuscatedPaths(
-                                  destDir.absolutePath(), sequence, cutName)));
+    QMessageBox::critical(
+        this, tr("Error"),
+        tr("Failed to create the folder %1.").arg(destDir.absolutePath()));
     return;
   }
 
@@ -490,21 +487,21 @@ void RegisterSceneDialog::onRegisterClicked() {
   if (copyMethod) {
     if (QFileInfo::exists(destPath) && !QFile::remove(destPath)) {
       ok       = false;
-      errorMsg = tr("Failed to remove the existing file %1.").arg(displayPath);
+      errorMsg = tr("Failed to remove the existing file %1.").arg(destPath);
     } else {
       ok = QFile::copy(sourcePath, destPath);
-      if (!ok) errorMsg = tr("Failed to copy the file to %1.").arg(displayPath);
+      if (!ok) errorMsg = tr("Failed to copy the file to %1.").arg(destPath);
     }
   } else if (destExists) {  // 既存のファイル／フォルダをそのまま使う
     ok = true;
   } else if (QFileInfo(destPath).suffix().isEmpty()) {  // フォルダ
     ok = QDir().mkpath(destPath);
-    if (!ok) errorMsg = tr("Failed to create the folder %1.").arg(displayPath);
+    if (!ok) errorMsg = tr("Failed to create the folder %1.").arg(destPath);
   } else {  // 空のファイル
     QFile file(destPath);
     ok = file.open(QIODevice::WriteOnly | QIODevice::Text);
     file.close();
-    if (!ok) errorMsg = tr("Failed to create the file %1.").arg(displayPath);
+    if (!ok) errorMsg = tr("Failed to create the file %1.").arg(destPath);
   }
 
   m_didRegister       = true;

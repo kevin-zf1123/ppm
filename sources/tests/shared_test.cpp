@@ -156,16 +156,6 @@ private slots:
     MyTable table;
     table.simpleSearch(0);
     QVERIFY(wm->isInProgress("0001", 0));
-    const QString secret = root.filePath("private/cue.clip");
-    QVERIFY(QDir().mkpath(root.filePath("private")));
-    QVERIFY(write(secret, "hidden drawing"));
-    QString actionLog;
-    QVariant record;
-    StepExecutor_Copy copier({Step_Copy, {stored + "/public.clip"}}, secret, {},
-                             "0001", false);
-    QVERIFY(copier.execute(actionLog, record));
-    QVERIFY(!actionLog.contains(root.filePath("private")));
-    QVERIFY(actionLog.contains("[HIDDEN]"));
     // This local path is also the stored prefix of a second rule. The
     // editor must offer both interpretations, including cancel.
     QString input = root.filePath("ambiguous");
@@ -308,12 +298,6 @@ private slots:
       QVERIFY(write(composed, "b"));
       QVERIFY(SharedFiles::actualPath(composed).isEmpty());
       QVERIFY(SharedFiles::actualPath(decomposed).isEmpty());
-      StepExecutor_Copy copy({Step_Copy, {decomposed}}, composed, {}, {},
-                             false);
-      QString log;
-      QVariant checksum;
-      QVERIFY(!copy.execute(log, checksum));
-      QVERIFY(log.contains("Ambiguous"));
       QVERIFY(QFileInfo::exists(composed));
       QVERIFY(QFileInfo::exists(decomposed));
     }
