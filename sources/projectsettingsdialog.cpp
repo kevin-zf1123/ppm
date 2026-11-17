@@ -466,21 +466,21 @@ void BasicsPage::refresh() {
 }
 
 void BasicsPage::onFieldEdited() {
-  tmpSettings.projectTitle          = m_projectTitleEdit->text();
-  tmpSettings.projectDescription    = m_projectDescriptionEdit->toPlainText();
-  tmpSettings.cutNumberPrefix       = m_cutNumberPrefixEdit->text();
-  tmpSettings.useSequence           = m_useSequenceCheck->isChecked();
+  tmpSettings.projectTitle       = m_projectTitleEdit->text();
+  tmpSettings.projectDescription = m_projectDescriptionEdit->toPlainText();
+  tmpSettings.cutNumberPrefix    = m_cutNumberPrefixEdit->text();
+  tmpSettings.useSequence        = m_useSequenceCheck->isChecked();
   tmpSettings.projectRootPath =
       readProjectPath(m_projectRootPathEdit, tmpSettings.projectRootPath);
   tmpSettings.projectInfoFolderPath = readProjectPath(
       m_projectInfoFolderPathEdit, tmpSettings.projectInfoFolderPath);
-  tmpSettings.hasEpisodes           = m_episodesGroupBox->isChecked();
-  tmpSettings.episodeNames          = m_episodeNamesEdit->text().split(
+  tmpSettings.hasEpisodes  = m_episodesGroupBox->isChecked();
+  tmpSettings.episodeNames = m_episodeNamesEdit->text().split(
       QRegularExpression("[,;]"), Qt::SkipEmptyParts);
   for (auto& name : tmpSettings.episodeNames) name = name.trimmed();
   tmpSettings.logRootPath =
       readProjectPath(m_logRootPathEdit, tmpSettings.logRootPath);
-  tmpSettings.gasUrl             = m_gasUrlEdit->text();
+  tmpSettings.gasUrl = m_gasUrlEdit->text();
   tmpSettings.sceneThumbnailPath =
       readProjectPath(m_sceneThumbnailPathEdit, tmpSettings.sceneThumbnailPath);
   markDirty();
@@ -2278,7 +2278,7 @@ void buildStepMacroLineField(
 
   QFormLayout* fl = newProjectFormLayout();
   fl->setContentsMargins(0, 0, 0, 0);
-  MacroLineEdit* edit = new MacroLineEdit(parentWidget);
+  MacroLineEdit* edit  = new MacroLineEdit(parentWidget);
   const bool pathField = step.type != Step_InputGoogleSpreadsheet &&
                          step.type != Step_NotifyGoogleChat;
   if (candidateProvider) edit->setMacroCandidateProvider(candidateProvider);
