@@ -1068,8 +1068,8 @@ Check the path of the application in Preferences.</source>
         <translation>更新</translation>
     </message>
     <message>
-        <source>Multiple file names have the same Unicode spelling. The progress list was not updated.</source>
-        <translation>Unicode 正規化で同じ名前になるファイルが複数あります。進捗リストの更新を中止しました。</translation>
+        <source>A shared path could not be resolved. Check folder mappings and conflicting Unicode file names. The progress list was not updated.</source>
+        <translation>共有パスを解決できませんでした。フォルダのパス対応表と、Unicode 正規化で同じ名前になるファイルがないかを確認してください。進捗リストの更新を中止しました。</translation>
     </message>
     <message>
         <source>Multiple file names have the same Unicode spelling. Conflicting scenes were skipped.</source>

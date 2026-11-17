@@ -45,6 +45,8 @@ When both systems use the share, enable **Work in a mixed Windows / macOS enviro
 
 Use names that Windows can create. Avoid `< > : " / \ | ? *`, trailing dots or spaces, and reserved names such as `CON` and `NUL`. Avoid names that differ only by case or by the composed and decomposed forms of a Japanese character. The share determines whether two differently capitalized paths identify the same file. When PPM finds multiple canonically equivalent names during a copy, resolve the conflict before retrying.
 
+When rebuilding a workflow group's scene lists, an unresolved shared path leaves that group's saved progress list unchanged. Check the mapping table and conflicting Unicode names before retrying.
+
 In mixed environments, folder copies omit Finder's `.DS_Store` and AppleDouble `._*` files. Undo keeps a created folder if someone has added a drawing or another user file. After a move, when deleting an empty folder, or when undoing Create Empty Folder, PPM also removes hidden and system files left in an otherwise empty folder. Windows and macOS use different ZIP writers. When exchanging archives, check the extracted names and contents, especially Japanese names, with the receiving studio's extraction software. Action logs record the OS login name. The **User Name** preference changes the `[USER_NAME]` macro in paths.
 
 ### Where to put PPM itself

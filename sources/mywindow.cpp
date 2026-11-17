@@ -363,14 +363,14 @@ namespace {
 // 指定した1カット分のSEQUENCE/TAKE/R_TAKE/Rewind/CUTNUMBERを解決し、キューファイルが
 // 存在するかどうかを判定する。呼び出しごとに新たにローカルコピーを作って置換するため、
 // 他のカットの呼び出しと状態を共有せず、QtConcurrentによる並列呼び出しでも安全
-enum class CueStatus { Missing, Found, Ambiguous };
+enum class CueStatus { Missing, Found, Unresolved };
 CueStatus cueStatus(const QString& expanded) {
   if (expanded.isEmpty()) return CueStatus::Missing;
   if (!UserSettings::instance()->mixedEnvironment())
     return QFileInfo::exists(expanded) ? CueStatus::Found : CueStatus::Missing;
   const QString actual = SharedFiles::actualPath(
       WorkflowManager::instance()->resolveProjectPath(expanded));
-  if (actual.isEmpty()) return CueStatus::Ambiguous;
+  if (actual.isEmpty()) return CueStatus::Unresolved;
   return QFileInfo::exists(actual) ? CueStatus::Found : CueStatus::Missing;
 }
 
@@ -473,11 +473,12 @@ void MyTable::simpleSearch(FlowGroupId fgId) {
             return cutQueueFileExists(conditionPathBase, cutName, takeStyle);
           });
 
-      if (foundList.contains(CueStatus::Ambiguous)) {
+      if (foundList.contains(CueStatus::Unresolved)) {
         QMessageBox::warning(
             this, tr("Refresh"),
-            tr("Multiple file names have the same Unicode spelling. The "
-               "progress list was not updated."));
+            tr("A shared path could not be resolved. Check folder mappings "
+               "and conflicting Unicode file names. The progress list was "
+               "not updated."));
         return;
       }
       for (int i = 0; i < remainingCuts.size(); i++)
@@ -507,7 +508,7 @@ struct DoRefreshWorkItem {
 };
 
 struct DoRefreshResult {
-  bool found = false;
+  bool found     = false;
   bool ambiguous = false;
   DataInfo info;
 };
@@ -1036,10 +1037,14 @@ bool MyTable::setSpecialOpenButton(QPushButton* openButton, DataInfo info) {
   subDirName = WorkflowManager::collapseSeparators(subDirName);
 
   QDir dir = QFileInfo(info.paths[0]).dir();
-  QString local = WorkflowManager::instance()->resolveProjectPath(subDirName);
-  if (local.isEmpty()) return false;
-  QString subfolder = SharedFiles::actualPath(dir.filePath(local));
-  if (subfolder.isEmpty() || !dir.cd(subfolder)) return false;
+  if (UserSettings::instance()->mixedEnvironment()) {
+    QString local = WorkflowManager::instance()->resolveProjectPath(subDirName);
+    if (local.isEmpty()) return false;
+    QString subfolder = SharedFiles::actualPath(dir.filePath(local));
+    if (subfolder.isEmpty() || !dir.cd(subfolder)) return false;
+  } else {
+    dir.cd(subDirName);
+  }
   if (!dir.exists()) return false;
   QStringList filters;
   filters << "*.clip" << "*.tvpp" << "*.tnz";
