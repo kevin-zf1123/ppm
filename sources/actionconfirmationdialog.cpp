@@ -1036,7 +1036,8 @@ void MyFolderTree::createTreeChildren(QTreeWidgetItem* parentItem, int depth,
                                       QStringList whiteList,
                                       QStringList blackList) {
   QString folderPath = parentItem->data(0, Role_Path).toString();
-  if (folderPath.isEmpty()) return;
+  if (UserSettings::instance()->mixedEnvironment() && folderPath.isEmpty())
+    return;
 
   // std::cout << "folderPath = " << folderPath.toStdString() << std::endl;
   QStringList files =
@@ -5045,10 +5046,12 @@ RewindConfirmationDialog::RewindConfirmationDialog(
 
   for (auto step : steps) {
     StepExecutor* executor;
-    if (step.type == Step_CopyFolderContents)
+    if (UserSettings::instance()->mixedEnvironment() &&
+        step.type == Step_CopyFolderContents)
       executor = new StepExecutor_CopyFolderContents(
           wf.groupId, step, orgPaths[0], sequence, sceneNumber, isUndo, true);
-    else if (step.type == Step_CreateCueFile)
+    else if (UserSettings::instance()->mixedEnvironment() &&
+             step.type == Step_CreateCueFile)
       executor = new StepExecutor_CreateCueFile(step, sequence, sceneNumber,
                                                 isUndo, true);
     else

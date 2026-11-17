@@ -453,6 +453,24 @@ int main(int argc, char** argv) {
         SharedFiles::actualPath(input) !=
             (enabled ? root.filePath(existing.first()) : input))
       return 4;
+    // Stuff-relative paths must use the on-disk spelling without remapping.
+    const QString relative = existing.first().normalized(
+        existing.first() ==
+                existing.first().normalized(QString::NormalizationForm_C)
+            ? QString::NormalizationForm_D
+            : QString::NormalizationForm_C);
+    if (WorkflowManager::resolvePathFromStuffFolder(relative) !=
+        root.filePath(enabled ? existing.first() : relative))
+      return 5;
+    auto* wm = WorkflowManager::instance();
+    wm->setInfoFolderPath("info");
+    FlowGroupInfo group;
+    group.xdtsFileName = QStringLiteral("ガ.lookup");
+    wm->setFlowGroupInfos({{0, group}});
+    QStringList names{kana + ".lookup"};
+    if (wm->xdtsPaths(0, {}, "0001", names, false, {input}).size() !=
+        (enabled ? 0 : 1))
+      return 6;
     return 0;
   }
   SharedProjectCompatibilityTest test;

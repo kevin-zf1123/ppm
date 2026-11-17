@@ -961,7 +961,7 @@ QString WorkflowManager::decodePath(const QString& codedPath,
     else {  // 兼用カットの場合
       // ファイル名だけを個別のカット番号に置き換える
       int sepIndex =
-          std::max(retPath.lastIndexOf('/'), retPath.lastIndexOf('\\'));
+          std::max(retPath.lastIndexOf('/'), retPath.lastIndexOf('/'));
       QString folderPath = retPath.left(sepIndex);
       QString fileName   = retPath.right(retPath.size() - sepIndex);
       folderPath.replace("[CUTNUMBER]", stockSceneNumbers);
@@ -1001,8 +1001,10 @@ QString WorkflowManager::decodePath(const QString& codedPath,
       // 難読化されたパスマクロが残っている場合は、デコードしてから調べる
       tmpPath = decodeObfuscatedPathMacros(tmpPath, sequence, sceneNumber,
                                            stockSceneNumbers);
-      if (!tmpPath.isEmpty() &&
-          QFileInfo(SharedFiles::actualPath(tmpPath)).isDir()) {
+      tmpPath = SharedFiles::actualPath(tmpPath);
+      if ((!UserSettings::instance()->mixedEnvironment() ||
+           !tmpPath.isEmpty()) &&
+          QDir(tmpPath).exists()) {
         lastTakeSuffix = tmpSuffix;
         break;
       }
@@ -1093,13 +1095,14 @@ QString WorkflowManager::resolveProjectPath(const QString& expanded) const {
 
 QString WorkflowManager::resolvePathFromStuffFolder(const QString& path) {
   if (path.isEmpty()) return path;
+  QString local = path;
   if (UserSettings::instance()->mixedEnvironment() &&
       PathMappings::isAbsolute(path))
-    return SharedFiles::actualPath(
-        UserSettings::instance()->pathMappings().filesystemPath(path));
-  if (!QDir::isRelativePath(path)) return path;
-  return QDir::cleanPath(UserSettings::instance()->stuffFolderPath() + "/" +
-                         path);
+    local = UserSettings::instance()->pathMappings().filesystemPath(path);
+  else if (QDir::isRelativePath(path))
+    local = QDir::cleanPath(UserSettings::instance()->stuffFolderPath() + "/" +
+                            path);
+  return SharedFiles::actualPath(local);
 }
 
 // pathがProjectRootの下にある場合、Rootからの相対パスを返す
@@ -1147,7 +1150,8 @@ QStringList WorkflowManager::xdtsPaths(FlowGroupId id, QString sequence,
                                        bool obtainBothGengaAndDouga,
                                        const QStringList& cueFilePaths,
                                        bool* ambiguous) {
-  bool conflict = false;
+  const bool mixed = UserSettings::instance()->mixedEnvironment();
+  bool conflict    = false;
   if (ambiguous) *ambiguous = false;
   QStringList ret;
 
@@ -1177,11 +1181,10 @@ QStringList WorkflowManager::xdtsPaths(FlowGroupId id, QString sequence,
     QString folder = QFileInfo(cueFilePath).absolutePath();
     bool already   = false;
     for (auto& f : searchFolders)
-      if (UserSettings::instance()->mixedEnvironment()
-              ? SharedFiles::sameEntry(f, folder)
-              : QFileInfo(f).absoluteFilePath().compare(
-                    QFileInfo(folder).absoluteFilePath(),
-                    Qt::CaseInsensitive) == 0)
+      if (mixed ? SharedFiles::sameEntry(f, folder)
+                : QFileInfo(f).absoluteFilePath().compare(
+                      QFileInfo(folder).absoluteFilePath(),
+                      Qt::CaseInsensitive) == 0)
         already = true;
     if (!already) searchFolders.append(folder);
   }
@@ -1190,15 +1193,14 @@ QStringList WorkflowManager::xdtsPaths(FlowGroupId id, QString sequence,
   // 先に探したフォルダ（標準カットフォルダ）のものだけを使う
   // （xdtsFileNamesは、メニューの表示名やコピーするファイル名として使われるため）
   auto addIfExists = [&](const QString& fileName) {
-    if (!UserSettings::instance()->mixedEnvironment() &&
-        xdtsFileNames.contains(fileName, Qt::CaseInsensitive))
+    if (mixed) {
+      const QString name = fileName.normalized(QString::NormalizationForm_C);
+      for (const QString& found : xdtsFileNames)
+        if (found.normalized(QString::NormalizationForm_C) == name) return true;
+    } else if (xdtsFileNames.contains(fileName, Qt::CaseInsensitive))
       return true;
-    for (const QString& found : xdtsFileNames)
-      if (found.normalized(QString::NormalizationForm_C) ==
-          fileName.normalized(QString::NormalizationForm_C))
-        return true;
     for (auto& folder : searchFolders) {
-      if (folder.isEmpty()) continue;
+      if (mixed && folder.isEmpty()) continue;
       QString tmpPath = SharedFiles::actualPath(folder + "/" + fileName);
       if (tmpPath.isEmpty()) {
         conflict = true;
@@ -1206,7 +1208,7 @@ QStringList WorkflowManager::xdtsPaths(FlowGroupId id, QString sequence,
       }
       if (QFileInfo(tmpPath).exists()) {
         ret.append(tmpPath);
-        xdtsFileNames.append(QFileInfo(tmpPath).fileName());
+        xdtsFileNames.append(mixed ? QFileInfo(tmpPath).fileName() : fileName);
         return true;
       }
     }
@@ -1240,14 +1242,16 @@ QStringList WorkflowManager::xdtsPaths(FlowGroupId id, QString sequence,
 
 QString WorkflowManager::logFilePath(QString sequence, QString sceneNumber) {
   QString fileName = m_cutNumberPrefix + sceneNumber + ".md";
-  if (logRootPath().isEmpty()) return {};
+  if (UserSettings::instance()->mixedEnvironment() && logRootPath().isEmpty())
+    return {};
   return logRootPathForCurrentEpisode() +
          (sequence.isEmpty() ? QString() : "/" + sequence) + "/" + fileName;
 }
 
 QString WorkflowManager::googleCueFilePath(QString googleCueFileName) {
   const QString logRoot = logRootPath();
-  if (logRoot.isEmpty()) return {};
+  if (UserSettings::instance()->mixedEnvironment() && logRoot.isEmpty())
+    return {};
   QDir(logRoot).mkpath("google_spreadsheet_cues");
   return logRoot + "/google_spreadsheet_cues/" + googleCueFileName +
          ".ini";
@@ -1521,7 +1525,8 @@ QString WorkflowManager::createCutFolder(const QString sceneNumber,
   QString sequence = sceneNum2Sequence(sceneNumber);
   QString path     = cutFolderPath(passToFgId, sequence, sceneNumber, takeNum);
   std::cout << "create path : " << path.toStdString() << std::endl;
-  if (!path.isEmpty() && QDir(path).mkpath("."))
+  if ((!UserSettings::instance()->mixedEnvironment() || !path.isEmpty()) &&
+      QDir(path).mkpath("."))
     return path;
   else
     return QString();
