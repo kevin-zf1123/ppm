@@ -22,7 +22,9 @@ class UserSettings {  // singleton
   QString m_userNameOverride;
 
   QString m_stuffFolderPath;
-  PathMappings m_defaultMappings, m_mappings, m_activeMappings;
+  PathMappings m_defaultMappings, m_personalMappings, m_activeMappings;
+  bool m_configuredMixed = false;
+  bool m_activeMixed     = false;
   bool m_inheritMappings = true;
 
   // UIの言語（翻訳ファイルPPM_[languageCode].qmの[languageCode]。例："ja"）。
@@ -58,7 +60,10 @@ public:
   QString stuffFolderPath() const { return m_stuffFolderPath; }
 
   const PathMappings& pathMappings() const { return m_activeMappings; }
-  const PathMappings& configuredMappings() const { return m_mappings; }
+  bool mixedEnvironment() const { return m_activeMixed; }
+  bool configuredMixedEnvironment() const { return m_configuredMixed; }
+  void setMixedEnvironment(bool enabled);
+  const PathMappings& personalMappings() const { return m_personalMappings; }
   const PathMappings& defaultMappings() const { return m_defaultMappings; }
   bool inheritsMappings() const { return m_inheritMappings; }
   void setPathMappings(const PathMappings& mappings, bool inherit);

@@ -32,11 +32,14 @@ If the file at an application path cannot be found, or the translation file of t
 
 ## Shared folder mappings
 
-Open **Shared folder mappings...** in Preferences. Clear **Use platform defaults from the Stuff folder** to edit your own table. Add one row per shared location. The left column is the absolute prefix stored in the project and the right column is its location on this machine. **OK** saves the entire table. An empty personal table disables mapping. Select the defaults checkbox again to inherit future changes from the studio. Restart PPM to apply the table.
+When Windows and macOS use the same production share, turn on **Work in a mixed Windows / macOS environment** in Preferences. This enables matching composed and decomposed file names, even with an empty mapping table. Leave it off in a single-platform studio to use normal file lookups. To translate paths, open **Shared folder mappings...** below the checkbox. Clear **Use platform defaults from the Stuff folder** to edit your own table. Add one row per shared location. The left column is the absolute prefix stored in the project and the right column is its location on this machine. **OK** saves the entire table. An empty personal table disables mapping. Select the defaults checkbox again to use the studio table. Your personal table is saved and returns when you clear the checkbox. Restart PPM to apply changes to either setting.
 
-Administrators can put `defaultusersettings_windows.ini` and `defaultusersettings_macos.ini` in Stuff. For example, the Mac file can contain:
+Administrators can put `defaultusersettings_windows.ini` and `defaultusersettings_macos.ini` in Stuff. For example, the Mac file can contain the following settings.
 
 ```ini
+[UserSettings]
+MixedEnvironment=true
+
 [PathMappings]
 size=1
 1\stored=//fileserver/anime

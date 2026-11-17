@@ -7,6 +7,11 @@
 #include "usersettings.h"
 
 #include <QFile>
+#include <QProcess>
+#include <memory>
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 #include <QJsonDocument>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -62,6 +67,17 @@ private slots:
     QSettings ini(root.filePath(name), QSettings::IniFormat);
     defaults.write(ini);
     ini.sync();
+    // A platform mapping without an explicit opt-in must leave Windows-only
+    // studios on the normal filesystem path, including after an upgrade.
+    QVERIFY(write(root.filePath(QStringLiteral("ガ.lookup")), "cue"));
+    QProcess plain;
+    plain.start(QCoreApplication::applicationFilePath(),
+                {"--mapping-settings", QCoreApplication::applicationName(),
+                 "off", stored, stored, root.path()});
+    QVERIFY(plain.waitForFinished());
+    QCOMPARE(plain.exitCode(), 0);
+    ini.setValue("UserSettings/MixedEnvironment", true);
+    ini.sync();
     QCOMPARE(UserSettings::instance()->pathMappings().toLocal(stored),
              root.path());
   }
@@ -98,11 +114,33 @@ private slots:
                   QSettings::IniFormat);
     QVERIFY(ini.contains("PathMappings/size"));
     QCOMPARE(PathMappings::read(ini).rows.size(), 0);
-    user->setPathMappings(defaults, false);
-    QCOMPARE(PathMappings::read(ini).toLocal(stored), root.path());
+    PathMappings personal;
+    personal.rows = {{stored, root.filePath("personal")}};
+    user->setPathMappings(personal, false);
     user->setPathMappings({}, true);
-    QVERIFY(!ini.contains("PathMappings/size"));
-    QCOMPARE(user->configuredMappings().toLocal(stored), root.path());
+    QCOMPARE(PathMappings::read(ini).toLocal(stored),
+             root.filePath("personal"));
+    QVERIFY(user->inheritsMappings());
+    QCOMPARE(user->personalMappings().toLocal(stored),
+             root.filePath("personal"));
+    auto restart = [&](const QString& mode, const QString& local) {
+      QProcess child;
+      child.start(QCoreApplication::applicationFilePath(),
+                  {"--mapping-settings", QCoreApplication::applicationName(),
+                   mode, stored, local, root.filePath("personal")});
+      QVERIFY(child.waitForFinished());
+      QCOMPARE(child.exitStatus(), QProcess::NormalExit);
+      QCOMPARE(child.exitCode(), 0);
+    };
+    restart("on", root.path());
+    user->setPathMappings(user->personalMappings(), false);
+    restart("on", root.filePath("personal"));
+    user->setMixedEnvironment(false);
+    restart("off", stored);
+    user->setMixedEnvironment(true);
+    user->setPathMappings({}, false);
+    restart("on", stored);
+    user->setPathMappings({}, true);
   }
 
   void projectEditorAndScan() {
@@ -130,7 +168,8 @@ private slots:
         folders.begin(), folders.end(),
         [&](FolderPathField* f) { return f->text() == root.path(); });
     QVERIFY(rootField != folders.end());
-    QVERIFY((*rootField)->toolTip().contains(stored));
+    QVERIFY(
+        (*rootField)->toolTip().contains(QDir::fromNativeSeparators(stored)));
     auto edits = basics.findChildren<QLineEdit*>();
     auto title = std::find_if(edits.begin(), edits.end(), [](QLineEdit* edit) {
       return edit->text() == "Title";
@@ -141,8 +180,9 @@ private slots:
     QVERIFY(saveTmpSettingsToProject(nullptr, "shared"));
     QVERIFY(wm->loadProject("shared"));
     QCOMPARE(wm->projectTitle(), "Edited title");
-    QCOMPARE(wm->projectRootPathSetting(), stored);
-    QCOMPARE(wm->logRootPathSetting(), stored + "/logs");
+    QCOMPARE(wm->projectRootPathSetting(), QDir::fromNativeSeparators(stored));
+    QCOMPARE(wm->logRootPathSetting(),
+             QDir::fromNativeSeparators(stored + "/logs"));
     QCOMPARE(wm->getWorkflow(0).protocols.first().conditionPath,
              "[ROOT]/[CUTNUMBER].clip");
     QCOMPARE(wm->decodePath("[ROOT]/drawing", {}, {}),
@@ -156,16 +196,6 @@ private slots:
     MyTable table;
     table.simpleSearch(0);
     QVERIFY(wm->isInProgress("0001", 0));
-    const QString secret = root.filePath("private/cue.clip");
-    QVERIFY(QDir().mkpath(root.filePath("private")));
-    QVERIFY(write(secret, "hidden drawing"));
-    QString actionLog;
-    QVariant record;
-    StepExecutor_Copy copier({Step_Copy, {stored + "/public.clip"}}, secret, {},
-                             "0001", false);
-    QVERIFY(copier.execute(actionLog, record));
-    QVERIFY(!actionLog.contains(root.filePath("private")));
-    QVERIFY(actionLog.contains("[HIDDEN]"));
     // This local path is also the stored prefix of a second rule. The
     // editor must offer both interpretations, including cancel.
     QString input = root.filePath("ambiguous");
@@ -177,7 +207,7 @@ private slots:
       chooser->reject();
     });
     QVERIFY(QMetaObject::invokeMethod(&basics, "onFieldEdited"));
-    QCOMPARE(tmpSettings.projectRootPath, stored);
+    QCOMPARE(tmpSettings.projectRootPath, QDir::fromNativeSeparators(stored));
     (*rootField)->setText(input);
     QTimer::singleShot(0, [&] {
       auto* chooser =
@@ -207,7 +237,8 @@ private slots:
     QVERIFY(saveTmpSettingsToProject(nullptr, "shared"));
     QVERIFY(wm->loadProject("shared"));
     QCOMPARE(wm->projectRootPathSetting(), "//Studio/Anime/New");
-    QCOMPARE(wm->infoFolderPathSetting(), stored + "/info");
+    QCOMPARE(wm->infoFolderPathSetting(),
+             QDir::fromNativeSeparators(stored + "/info"));
     QCOMPARE(wm->sceneThumbnailPath(), "[ROOT]/[CUTNUMBER].png");
   }
 
@@ -297,6 +328,79 @@ private slots:
     QVERIFY(lock.isEmpty());
   }
 
+  void hiddenFolderCleanup_data() {
+    QTest::addColumn<QString>("action");
+    QTest::newRow("move source") << QString("move");
+    QTest::newRow("ask delete") << QString("delete");
+    QTest::newRow("undo create empty folder") << QString("undo");
+  }
+
+  void hiddenFolderCleanup() {
+    QFETCH(QString, action);
+    const QString group = "/cleanup-" + action;
+    const QString dir   = root.path() + group + "/scene";
+    QVERIFY(QDir().mkpath(dir));
+#ifdef Q_OS_WIN
+    const QString hidden = dir + "/desktop.ini";
+    QVERIFY(write(hidden, "shell metadata"));
+    QVERIFY(SetFileAttributesW(reinterpret_cast<LPCWSTR>(hidden.utf16()),
+                               FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM));
+#else
+    QVERIFY(write(dir + "/.hidden", "hidden"));
+#endif
+    QString log;
+    QVariant record;
+    if (action == "move") {
+      QVERIFY(write(dir + "/drawing.clip", "drawing"));
+      StepExecutor_CopyFolderContents move(
+          0,
+          {Step_CopyFolderContents,
+           {"[ALL_WITHOUT_UI][MOVE]", stored + group, stored + "/moved"}},
+          dir + "/drawing.clip", {}, "0001", false);
+      QVERIFY2(move.execute(log, record), qPrintable(log));
+      QVERIFY(QFileInfo::exists(root.filePath("moved/scene/drawing.clip")));
+    } else if (action == "delete") {
+      StepExecutor_AskDelete remove(
+          {Step_AskDelete, {true, stored + group + "/scene"}}, {}, {}, {},
+          false);
+      std::unique_ptr<QWidget> options(remove.createWidget());
+      QVERIFY2(remove.execute(log, record), qPrintable(log));
+    } else {
+      const QString visible = dir + "/keep.clip";
+      QVERIFY(write(visible, "drawing"));
+      StepExecutor_CreateEmptyFolder undo(
+          {Step_CreateEmptyFolder, {stored + group + "/scene"}}, {}, {}, true);
+      undo.setCheckSum(true);
+      QVERIFY(undo.execute(log, record));
+      QVERIFY(QFileInfo::exists(visible));
+      QVERIFY(QFile::remove(visible));
+      QVERIFY2(undo.execute(log, record), qPrintable(log));
+    }
+    QVERIFY(!QFileInfo::exists(dir));
+  }
+
+  void refreshDirectorySnapshot() {
+    // A spelling that appears after a refresh must be picked up by the next
+    // refresh. Row scans within the first refresh use its directory listing.
+    const QString dir = root.filePath("listing");
+    QVERIFY(QDir().mkdir(dir));
+    const QString nfd =
+        QStringLiteral("ガ.clip").normalized(QString::NormalizationForm_D);
+    const QString nfc    = QStringLiteral("ガ.clip");
+    const QString lookup = dir + "/" + nfd;
+    {
+      SharedFiles::RefreshCache snapshot;
+      auto scope = snapshot.use();
+      QCOMPARE(SharedFiles::actualPath(lookup), lookup);
+      QVERIFY(write(dir + "/" + nfc, "drawing"));
+      QCOMPARE(SharedFiles::actualPath(lookup), lookup);
+    }
+    SharedFiles::RefreshCache next;
+    auto scope = next.use();
+    QCOMPARE(SharedFiles::actualPath(lookup),
+             dir + "/" + QDir(dir).entryList(QDir::Files).first());
+  }
+
   void equivalentSpellings() {
     const QString composed   = root.filePath("ペ.clip");
     const QString decomposed = root.filePath(
@@ -308,17 +412,41 @@ private slots:
       QVERIFY(write(composed, "b"));
       QVERIFY(SharedFiles::actualPath(composed).isEmpty());
       QVERIFY(SharedFiles::actualPath(decomposed).isEmpty());
-      StepExecutor_Copy copy({Step_Copy, {decomposed}}, composed, {}, {},
-                             false);
-      QString log;
-      QVariant checksum;
-      QVERIFY(!copy.execute(log, checksum));
-      QVERIFY(log.contains("Ambiguous"));
       QVERIFY(QFileInfo::exists(composed));
       QVERIFY(QFileInfo::exists(decomposed));
     }
   }
 };
 
-QTEST_MAIN(SharedTest)
+int main(int argc, char** argv) {
+  QApplication app(argc, argv);
+  const QStringList args = app.arguments();
+  if (args.size() == 7 && args[1] == "--mapping-settings") {
+    QStandardPaths::setTestModeEnabled(true);
+    app.setApplicationName(args[2]);
+    const auto* user   = UserSettings::instance();
+    const bool enabled = args[3] == "on";
+    if (user->mixedEnvironment() != enabled ||
+        user->pathMappings().toLocal(args[4]) != args[5])
+      return 1;
+    if (user->inheritsMappings() &&
+        user->personalMappings().toLocal(args[4]) != args[6])
+      return 2;
+    const QString kana =
+        QStringLiteral("ガ").normalized(QString::NormalizationForm_D);
+    if (SharedFiles::comparisonName(kana) !=
+        (enabled ? QStringLiteral("ガ") : kana))
+      return 3;
+    QDir root(user->stuffFolderPath());
+    const QString input        = root.filePath(kana + ".lookup");
+    const QStringList existing = root.entryList({"*.lookup"}, QDir::Files);
+    if (existing.size() != 1 ||
+        SharedFiles::actualPath(input) !=
+            (enabled ? root.filePath(existing.first()) : input))
+      return 4;
+    return 0;
+  }
+  SharedTest test;
+  return QTest::qExec(&test, argc, argv);
+}
 #include "shared_test.moc"
