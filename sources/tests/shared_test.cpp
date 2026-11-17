@@ -62,6 +62,8 @@ private slots:
     QSettings ini(root.filePath(name), QSettings::IniFormat);
     defaults.write(ini);
     ini.sync();
+    ini.setValue("UserSettings/MixedEnvironment", true);
+    ini.sync();
     QCOMPARE(UserSettings::instance()->pathMappings().toLocal(stored),
              root.path());
   }
@@ -98,11 +100,15 @@ private slots:
                   QSettings::IniFormat);
     QVERIFY(ini.contains("PathMappings/size"));
     QCOMPARE(PathMappings::read(ini).rows.size(), 0);
-    user->setPathMappings(defaults, false);
-    QCOMPARE(PathMappings::read(ini).toLocal(stored), root.path());
+    PathMappings personal;
+    personal.rows = {{stored, root.filePath("personal")}};
+    user->setPathMappings(personal, false);
     user->setPathMappings({}, true);
-    QVERIFY(!ini.contains("PathMappings/size"));
-    QCOMPARE(user->configuredMappings().toLocal(stored), root.path());
+    QCOMPARE(PathMappings::read(ini).toLocal(stored),
+             root.filePath("personal"));
+    QVERIFY(user->inheritsMappings());
+    QCOMPARE(user->personalMappings().toLocal(stored),
+             root.filePath("personal"));
   }
 
   void projectEditorAndScan() {
@@ -130,7 +136,8 @@ private slots:
         folders.begin(), folders.end(),
         [&](FolderPathField* f) { return f->text() == root.path(); });
     QVERIFY(rootField != folders.end());
-    QVERIFY((*rootField)->toolTip().contains(stored));
+    QVERIFY(
+        (*rootField)->toolTip().contains(QDir::fromNativeSeparators(stored)));
     auto edits = basics.findChildren<QLineEdit*>();
     auto title = std::find_if(edits.begin(), edits.end(), [](QLineEdit* edit) {
       return edit->text() == "Title";
@@ -141,8 +148,9 @@ private slots:
     QVERIFY(saveTmpSettingsToProject(nullptr, "shared"));
     QVERIFY(wm->loadProject("shared"));
     QCOMPARE(wm->projectTitle(), "Edited title");
-    QCOMPARE(wm->projectRootPathSetting(), stored);
-    QCOMPARE(wm->logRootPathSetting(), stored + "/logs");
+    QCOMPARE(wm->projectRootPathSetting(), QDir::fromNativeSeparators(stored));
+    QCOMPARE(wm->logRootPathSetting(),
+             QDir::fromNativeSeparators(stored + "/logs"));
     QCOMPARE(wm->getWorkflow(0).protocols.first().conditionPath,
              "[ROOT]/[CUTNUMBER].clip");
     QCOMPARE(wm->decodePath("[ROOT]/drawing", {}, {}),
@@ -167,7 +175,7 @@ private slots:
       chooser->reject();
     });
     QVERIFY(QMetaObject::invokeMethod(&basics, "onFieldEdited"));
-    QCOMPARE(tmpSettings.projectRootPath, stored);
+    QCOMPARE(tmpSettings.projectRootPath, QDir::fromNativeSeparators(stored));
     (*rootField)->setText(input);
     QTimer::singleShot(0, [&] {
       auto* chooser =
@@ -197,7 +205,8 @@ private slots:
     QVERIFY(saveTmpSettingsToProject(nullptr, "shared"));
     QVERIFY(wm->loadProject("shared"));
     QCOMPARE(wm->projectRootPathSetting(), "//Studio/Anime/New");
-    QCOMPARE(wm->infoFolderPathSetting(), stored + "/info");
+    QCOMPARE(wm->infoFolderPathSetting(),
+             QDir::fromNativeSeparators(stored + "/info"));
     QCOMPARE(wm->sceneThumbnailPath(), "[ROOT]/[CUTNUMBER].png");
   }
 

@@ -1,4 +1,5 @@
 #include "sharedfiles.h"
+#include "usersettings.h"
 
 #include <QDir>
 #include <filesystem>
@@ -8,9 +9,30 @@ namespace SharedFiles {
 namespace {
 constexpr auto allEntries =
     QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System;
+
+QHash<QString, QString> directoryNames(const QDir& dir) {
+  QHash<QString, QString> names;
+  for (const QString& entry : dir.entryList(allEntries, QDir::Unsorted)) {
+    const QString key = entry.normalized(QString::NormalizationForm_C);
+    if (names.contains(key))
+      names[key].clear();
+    else
+      names.insert(key, entry);
+  }
+  return names;
+}
+}  // namespace
+
+thread_local RefreshCache* RefreshCache::current = nullptr;
+
+QString comparisonName(const QString& name) {
+  return UserSettings::instance()->mixedEnvironment()
+             ? name.normalized(QString::NormalizationForm_C)
+             : name;
 }
 
 QString actualPath(const QString& path) {
+  if (!UserSettings::instance()->mixedEnvironment()) return path;
   // Only components with a canonical decomposition can have another
   // composed/decomposed spelling. Avoid directory reads for ASCII paths.
   if (path.isEmpty() || std::all_of(path.cbegin(), path.cend(),
@@ -27,14 +49,18 @@ QString actualPath(const QString& path) {
     if (parent.size() == 2 && parent.endsWith(':')) parent += '/';
 #endif
     QDir dir(i && parent.isEmpty() ? "/" : parent);
-    const auto entries = dir.entryList(allEntries, QDir::Unsorted);
-    QString found;
-    for (const QString& entry : entries) {
-      if (entry.normalized(QString::NormalizationForm_C) != wanted) continue;
-      if (!found.isEmpty()) return {};
-      found = entry;
+    QString actual;
+    if (auto* cache = RefreshCache::current) {
+      QMutexLocker lock(&cache->mutex);
+      auto index = cache->directories.find(dir.path());
+      if (index == cache->directories.end())
+        index = cache->directories.insert(dir.path(), directoryNames(dir));
+      actual = index.value().value(wanted, parts[i]);
+    } else {
+      actual = directoryNames(dir).value(wanted, parts[i]);
     }
-    if (!found.isEmpty()) parts[i] = found;
+    if (actual.isEmpty()) return {};
+    parts[i] = actual;
   }
   return parts.join('/');
 }
@@ -69,13 +95,23 @@ bool insideSource(const QString& source, const QString& destination) {
 }
 
 bool isMetadata(const QFileInfo& entry) {
-  return !entry.isSymLink() && entry.isFile() &&
-         (entry.fileName() == ".DS_Store" || entry.fileName().startsWith("._"));
+  return UserSettings::instance()->mixedEnvironment() &&
+         (entry.fileName() == ".DS_Store" ||
+          entry.fileName().startsWith("._")) &&
+         !entry.isSymLink() && entry.isFile();
 }
 
-Cleanup removeEmptyFolder(const QString& path) {
+Cleanup removeEmptyFolder(const QString& path, EmptyFolderPolicy policy) {
   if (path.isEmpty() || QFileInfo(path).isSymLink()) return Cleanup::Kept;
   QDir dir(path);
+  if (policy == EmptyFolderPolicy::IgnoreHiddenAndSystem) {
+    // main ignores hidden/system entries when determining whether a moved
+    // folder can be removed. Also recognize Finder files visible over SMB.
+    for (const auto& entry : dir.entryInfoList(
+             QDir::AllEntries | QDir::NoDotAndDotDot, QDir::Unsorted))
+      if (!isMetadata(entry)) return Cleanup::Kept;
+    return dir.removeRecursively() ? Cleanup::Removed : Cleanup::Failed;
+  }
   const auto entries = dir.entryInfoList(allEntries, QDir::Unsorted);
   for (const auto& entry : entries)
     if (!isMetadata(entry)) return Cleanup::Kept;

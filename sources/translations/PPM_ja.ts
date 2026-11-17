@@ -3299,21 +3299,15 @@ Do you want to overwrite it?</source>
 </translation>
     </message>
     <message>
-        <source>Ambiguous or empty file path.
-</source>
-        <translation>ファイルのパスが空欄か、対象を特定できません。
-</translation>
-    </message>
-    <message>
         <source>Multiple file names have the same Unicode spelling.
 </source>
         <translation>Unicode 正規化で同じ名前になるファイルが複数あります。
 </translation>
     </message>
     <message>
-        <source>Ambiguous source or destination.
+        <source>Could not resolve the shared folder path on this machine.
 </source>
-        <translation>操作元と操作先を一意に特定できません。
+        <translation>この端末で共有フォルダのパスを解決できませんでした。
 </translation>
     </message>
 </context>
@@ -3401,12 +3395,6 @@ Deleting the file %1...</source>
         <source>Failed.
 </source>
         <translation>失敗。
-</translation>
-    </message>
-    <message>
-        <source>Ambiguous or empty file path.
-</source>
-        <translation>ファイルのパスが空欄か、対象を特定できません。
 </translation>
     </message>
 </context>
@@ -3500,12 +3488,6 @@ Deleting the file %1...</source>
         <location filename="../actionconfirmationdialog.cpp" line="2667"/>
         <source>Scene info(s) that should not exist to proceed the action are found!</source>
         <translation>アクションを進めるのに、あってはいけないカット情報が見つかりました！</translation>
-    </message>
-    <message>
-        <source>Ambiguous or empty file path.
-</source>
-        <translation>ファイルのパスが空欄か、対象を特定できません。
-</translation>
     </message>
 </context>
 <context>
@@ -3649,18 +3631,6 @@ The undo operation cannot restore them.</source>
 
 [警告] コピーによって既存のファイルが上書きされています。
 取り消し操作では元に戻せません。</translation>
-    </message>
-    <message>
-        <source>Ambiguous or missing source file.
-</source>
-        <translation>操作元のファイルが見つからないか、一意に特定できません。
-</translation>
-    </message>
-    <message>
-        <source>Ambiguous source or destination.
-</source>
-        <translation>操作元と操作先を一意に特定できません。
-</translation>
     </message>
 </context>
 <context>
@@ -4040,24 +4010,6 @@ N.B. Overwritten files will not be restored on undo.</source>
 %1</translation>
     </message>
     <message>
-        <source>Ambiguous or empty file path.
-</source>
-        <translation>ファイルのパスが空欄か、対象を特定できません。
-</translation>
-    </message>
-    <message>
-        <source>The destination is ambiguous or inside the source folder.
-</source>
-        <translation>操作先を特定できないか、操作先がコピー元のフォルダ内にあります。
-</translation>
-    </message>
-    <message>
-        <source>Ambiguous source or destination.
-</source>
-        <translation>操作元と操作先を一意に特定できません。
-</translation>
-    </message>
-    <message>
         <source>Multiple file names have the same Unicode spelling.
 </source>
         <translation>Unicode 正規化で同じ名前になるファイルが複数あります。
@@ -4167,12 +4119,6 @@ Do you want to create it?</source>
         <translation>フォルダ %1 の作成に失敗しました。
 </translation>
     </message>
-    <message>
-        <source>Ambiguous or empty file path.
-</source>
-        <translation>ファイルのパスが空欄か、対象を特定できません。
-</translation>
-    </message>
 </context>
 <context>
     <name>StepExecutor_CreateEmptyFolder</name>
@@ -4243,12 +4189,6 @@ Do you want to create it?</source>
         <source>Skipped as the folder already exists.
 </source>
         <translation>フォルダが既に存在するためスキップされます。
-</translation>
-    </message>
-    <message>
-        <source>Ambiguous or empty file path.
-</source>
-        <translation>ファイルのパスが空欄か、対象を特定できません。
 </translation>
     </message>
 </context>
@@ -4328,12 +4268,6 @@ To: %2
         <location filename="../actionconfirmationdialog.cpp" line="3866"/>
         <source>  Remove renamed file: </source>
         <translation>  リネームされたファイルを削除： </translation>
-    </message>
-    <message>
-        <source>Ambiguous or occupied destination.
-</source>
-        <translation>操作先を特定できないか、すでに同名のファイルがあります。
-</translation>
     </message>
 </context>
 <context>
@@ -4755,18 +4689,6 @@ To: %2
         <source>  Remove renamed files: </source>
         <translation>  リネームされたファイルを削除： </translation>
     </message>
-    <message>
-        <source>Ambiguous or missing source file.
-</source>
-        <translation>操作元のファイルが見つからないか、一意に特定できません。
-</translation>
-    </message>
-    <message>
-        <source>Ambiguous source or destination.
-</source>
-        <translation>操作元と操作先を一意に特定できません。
-</translation>
-    </message>
 </context>
 <context>
     <name>StepExecutor_RenameFile</name>
@@ -4997,18 +4919,6 @@ The undo operation cannot restore them.</source>
 [警告] コピーによって既存のファイルが上書きされています。
 取り消し操作では元に戻せません。</translation>
     </message>
-    <message>
-        <source>Ambiguous or empty file path.
-</source>
-        <translation>ファイルのパスが空欄か、対象を特定できません。
-</translation>
-    </message>
-    <message>
-        <source>Ambiguous source or destination.
-</source>
-        <translation>操作元と操作先を一意に特定できません。
-</translation>
-    </message>
 </context>
 <context>
     <name>StepExecutor_SetSceneInfo</name>
@@ -5222,12 +5132,6 @@ Do you want to create it?</source>
         <location filename="../actionconfirmationdialog.cpp" line="3987"/>
         <source> Start removing file %1...</source>
         <translation> ファイル %1 を削除します...</translation>
-    </message>
-    <message>
-        <source>Ambiguous or empty file path.
-</source>
-        <translation>ファイルのパスが空欄か、対象を特定できません。
-</translation>
     </message>
 </context>
 <context>
@@ -5456,6 +5360,14 @@ The change is applied the next time the application is started.</source>
     <message>
         <source>Enter two absolute paths and use each stored prefix only once.</source>
         <translation>両方の欄に絶対パスを入力してください。保存パスの先頭部分は重複して登録できません。</translation>
+    </message>
+    <message>
+        <source>Enable this when Windows and macOS share production files. PPM matches equivalent Unicode file names and applies the shared folder mappings after restart.</source>
+        <translation>Windows と macOS で制作ファイルを共有するときにオンにします。再起動後、同じ文字の合成・分解の違いを考慮してファイル名を照合し、共有フォルダのパス対応表を適用します。</translation>
+    </message>
+    <message>
+        <source>Work in a mixed Windows / macOS environment</source>
+        <translation>Windows と macOS の混在環境で作業する</translation>
     </message>
 </context>
 <context>

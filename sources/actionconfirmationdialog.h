@@ -38,6 +38,7 @@ protected:
                    const QString& stockSceneNumbers = QString()) const;
   // 実際のパスを含みうる文字列（エラーメッセージ等）から、難読化されたパスを、マクロの文字列に戻して隠す
   QString hide(const QString& text) const;
+  static bool unresolvedSharedPath(const QString& path, QString& log);
 
 public:
   StepExecutor(bool isUndo) : m_isUndo(isUndo) {}

@@ -151,7 +151,20 @@ UserSettingsPopup::UserSettingsPopup(QWidget* parent, Qt::WindowFlags f)
     }
     auto* mappingsButton =
         new QPushButton(tr("Shared folder mappings..."), this);
-    uiLay->addWidget(mappingsButton, 8, 1);
+    auto* mixed =
+        new QCheckBox(tr("Work in a mixed Windows / macOS environment"), this);
+    mixed->setToolTip(
+        tr("Enable this when Windows and macOS share production files. PPM "
+           "matches equivalent Unicode file names and applies the shared "
+           "folder mappings after restart."));
+    mixed->setChecked(UserSettings::instance()->configuredMixedEnvironment());
+    mappingsButton->setEnabled(mixed->isChecked());
+    connect(mixed, &QCheckBox::toggled, this, [mappingsButton](bool enabled) {
+      UserSettings::instance()->setMixedEnvironment(enabled);
+      mappingsButton->setEnabled(enabled);
+    });
+    uiLay->addWidget(mixed, 8, 1);
+    uiLay->addWidget(mappingsButton, 9, 1);
     connect(mappingsButton, &QPushButton::clicked, this,
             &UserSettingsPopup::editMappings);
     mainLay->addLayout(uiLay);
@@ -210,11 +223,17 @@ void UserSettingsPopup::editMappings() {
       table->setItem(row, 1, new QTableWidgetItem(pair.local));
     }
   };
-  populate(settings->configuredMappings());
+  populate(inherit->isChecked() ? settings->defaultMappings()
+                                : settings->personalMappings());
   auto* buttons =
       new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-  auto* add    = buttons->addButton(tr("Add"), QDialogButtonBox::ActionRole);
-  auto* remove = buttons->addButton(tr("Remove"), QDialogButtonBox::ActionRole);
+  auto* editButtons = new QHBoxLayout();
+  auto* add         = new QPushButton(tr("Add"));
+  auto* remove      = new QPushButton(tr("Remove"));
+  editButtons->addWidget(add);
+  editButtons->addWidget(remove);
+  editButtons->addStretch();
+  layout->addLayout(editButtons);
   auto enableEditing = [=](bool defaults) {
     table->setEnabled(!defaults);
     add->setEnabled(!defaults);
@@ -223,7 +242,7 @@ void UserSettingsPopup::editMappings() {
   enableEditing(inherit->isChecked());
   connect(inherit, &QCheckBox::toggled, &dialog, [=](bool defaults) {
     populate(defaults ? settings->defaultMappings()
-                      : settings->configuredMappings());
+                      : settings->personalMappings());
     enableEditing(defaults);
   });
   connect(add, &QPushButton::clicked, &dialog, [table]() {

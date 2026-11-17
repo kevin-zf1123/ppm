@@ -366,6 +366,8 @@ namespace {
 enum class CueStatus { Missing, Found, Ambiguous };
 CueStatus cueStatus(const QString& expanded) {
   if (expanded.isEmpty()) return CueStatus::Missing;
+  if (!UserSettings::instance()->mixedEnvironment())
+    return QFileInfo::exists(expanded) ? CueStatus::Found : CueStatus::Missing;
   const QString actual = SharedFiles::actualPath(
       WorkflowManager::instance()->resolveProjectPath(expanded));
   if (actual.isEmpty()) return CueStatus::Ambiguous;
@@ -419,6 +421,8 @@ CueStatus cutQueueFileExists(const QString& conditionPathBase,
 
 // 各ワークフローに所属するカット名のリストを、実際のキューファイルの有無から更新する
 void MyTable::simpleSearch(FlowGroupId fgId) {
+  SharedFiles::RefreshCache cache;
+  auto scope = cache.use();
   QMap<WorkflowType, QStringList> progressList;
   // 現在fgIdグループに登録されているカット名のリストを取得する
   QStringList cutList = WorkflowManager::instance()->cutListInFlow(fgId) +
@@ -442,10 +446,12 @@ void MyTable::simpleSearch(FlowGroupId fgId) {
     // 各プロトコルについて
     for (auto protocol : wf.protocols) {
       // 条件パスを取得
-      QString conditionPathBase = WorkflowManager::instance()->decodePathMacros(
-          protocol.conditionPath);
+      QString conditionPathBase =
+          WorkflowManager::instance()->decodePathMacros(protocol.conditionPath);
       // 条件パスをデコード
-      // PREFIX and EPISODE; resolve ROOT with the per-scene path.
+      if (!UserSettings::instance()->mixedEnvironment())
+        conditionPathBase.replace(
+            "[ROOT]", WorkflowManager::instance()->projectRootPath());
 
       conditionPathBase.replace("[PREFIX]",
                                 WorkflowManager::instance()->cutNumberPrefix());
@@ -462,7 +468,8 @@ void MyTable::simpleSearch(FlowGroupId fgId) {
       // 各カットについて、キューファイルの有無をQtConcurrentで並列に判定する
       QList<CueStatus> foundList = QtConcurrent::blockingMapped(
           remainingCuts,
-          [&conditionPathBase, takeStyle](const QString& cutName) {
+          [&conditionPathBase, takeStyle, &cache](const QString& cutName) {
+            auto scope = cache.use();
             return cutQueueFileExists(conditionPathBase, cutName, takeStyle);
           });
 
@@ -598,6 +605,8 @@ void MyTable::doRefresh(const QList<WorkflowType>& checkedWfTypes,
                         const QList<WorkflowType>& lockedWfTypes,
                         const QMap<WorkflowType, int>& wfType_cbId_map,
                         bool appendMode) {
+  SharedFiles::RefreshCache cache;
+  auto scope = cache.use();
   setSortingEnabled(false);
   if (!appendMode) {
     clearContents();
@@ -636,8 +645,11 @@ void MyTable::doRefresh(const QList<WorkflowType>& checkedWfTypes,
 
   // 各ワークアイテムについて、キューファイルの有無をQtConcurrentで並列に判定する
   // （ファイルI/Oのみを行い、Qtウィジェットの生成はここでは行わない）
-  QList<DoRefreshResult> results =
-      QtConcurrent::blockingMapped(workItems, doRefreshWorkItem);
+  QList<DoRefreshResult> results = QtConcurrent::blockingMapped(
+      workItems, [&cache](const DoRefreshWorkItem& item) {
+        auto scope = cache.use();
+        return doRefreshWorkItem(item);
+      });
 
   // 判定結果に基づき、見つかったものだけをテーブルに登録する（QTableWidgetの操作はメインスレッドで行う）
   if (std::any_of(results.cbegin(), results.cend(),

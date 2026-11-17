@@ -62,13 +62,24 @@ UserSettings::UserSettings()
 #endif
     QSettings platformDefaults(m_stuffFolderPath + defaultsName,
                                QSettings::IniFormat);
-    m_mappings = m_defaultMappings = PathMappings::read(platformDefaults);
+    m_defaultMappings = PathMappings::read(platformDefaults);
+    m_configuredMixed =
+        platformDefaults.value("UserSettings/MixedEnvironment", false).toBool();
   }
 
+  m_personalMappings = m_defaultMappings;
   if (QFileInfo(userSettingsPath()).exists()) {
     QSettings settings(userSettingsPath(), QSettings::IniFormat);
-    m_inheritMappings = !settings.contains("PathMappings/size");
-    if (!m_inheritMappings) m_mappings = PathMappings::read(settings);
+    m_configuredMixed =
+        settings.value("UserSettings/MixedEnvironment", m_configuredMixed)
+            .toBool();
+    m_inheritMappings = settings
+                            .value("UserSettings/UsePlatformMappings",
+                                   !settings.contains("PathMappings/size"))
+                            .toBool();
+    if (settings.contains("PathMappings/size"))
+      m_personalMappings = PathMappings::read(settings);
+
     settings.beginGroup("UserSettings");
     m_tvpBinaryPath =
         settings.value("TvpBinaryPath", m_tvpBinaryPath).toString();
@@ -90,8 +101,10 @@ UserSettings::UserSettings()
     settings.endGroup();
   }
 
-  m_activeMappings =
-      m_mappings;  // Bind the open project and its undo records to one mount.
+  m_activeMixed = m_configuredMixed;
+  if (m_activeMixed)
+    m_activeMappings =
+        m_inheritMappings ? m_defaultMappings : m_personalMappings;
 
   // どちらにも言語の指定が無い場合は、OSの表示言語のうち、翻訳ファイルがあるものを使う
   // （見つからなければ英語）
@@ -110,12 +123,18 @@ UserSettings::UserSettings()
 
 void UserSettings::setPathMappings(const PathMappings& mappings, bool inherit) {
   QSettings settings(userSettingsPath(), QSettings::IniFormat);
-  if (inherit)
-    settings.remove("PathMappings");
-  else
-    mappings.write(settings);
+  settings.setValue("UserSettings/UsePlatformMappings", inherit);
   m_inheritMappings = inherit;
-  m_mappings        = inherit ? m_defaultMappings : mappings;
+  if (!inherit) {
+    mappings.write(settings);
+    m_personalMappings = mappings;
+  }
+}
+
+void UserSettings::setMixedEnvironment(bool enabled) {
+  QSettings settings(userSettingsPath(), QSettings::IniFormat);
+  settings.setValue("UserSettings/MixedEnvironment", enabled);
+  m_configuredMixed = enabled;
 }
 
 void UserSettings::warnAboutMissingBinaries() {
