@@ -120,7 +120,7 @@ The experimental macOS build supports external applications and the Zip Folder s
 Add `-DPPM_BUILD_TESTS=ON` to the configure command, build, and run:
 
 ```bash
-ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag|confirmation|macos_operations)_tests$' --output-on-failure
+ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag|confirmation|sharedprojectcompatibility|macos_operations)_tests$' --output-on-failure
 ```
 
 GitHub Actions builds PPM with Qt 6.12 on Windows x64 and macOS arm64. Both platforms test configuration lookup, Stuff paths, per-user settings, scene-tag destruction, and confirming or canceling forward and rewind actions. The macOS tests also open documents in a test application, check OpenToonz argument delivery, and exercise ZIP creation and undo.

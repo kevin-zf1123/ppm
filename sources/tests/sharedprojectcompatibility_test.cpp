@@ -22,7 +22,7 @@
 #include <QTimer>
 #include <QtTest>
 
-class SharedTest : public QObject {
+class SharedProjectCompatibilityTest : public QObject {
   Q_OBJECT
   // An explicit test root allows the same actions to run on a mounted share.
   QTemporaryDir root{qEnvironmentVariable("PPM_TEST_VOLUME", QDir::tempPath()) +
@@ -455,7 +455,7 @@ int main(int argc, char** argv) {
       return 4;
     return 0;
   }
-  SharedTest test;
+  SharedProjectCompatibilityTest test;
   return QTest::qExec(&test, argc, argv);
 }
-#include "shared_test.moc"
+#include "sharedprojectcompatibility_test.moc"

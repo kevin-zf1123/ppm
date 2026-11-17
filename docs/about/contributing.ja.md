@@ -120,7 +120,7 @@ macOS の試験的なビルドでは、外部アプリの起動と「フォル�
 構成時のコマンドに `-DPPM_BUILD_TESTS=ON` を追加してビルドし、次を実行します。
 
 ```bash
-ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag|confirmation|macos_operations)_tests$' --output-on-failure
+ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag|confirmation|sharedprojectcompatibility|macos_operations)_tests$' --output-on-failure
 ```
 
 GitHub Actions は、Qt 6.12 を使って Windows x64 と macOS arm64 で PPM をビルドします。両方の環境で、設定ファイルの検索、Stuff フォルダのパス、ユーザー設定の保存先、終了時のカット情報タグの破棄、承認・工程内リテイク操作の確定とキャンセルを検証します。macOS では、テスト用アプリでのファイルのオープン、OpenToonz 用の引数の受け渡し、ZIP の作成と取り消しも検証します。
