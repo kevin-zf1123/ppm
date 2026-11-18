@@ -289,6 +289,12 @@ void RetakeDialog::onCutNameEdited() {
 void RetakeDialog::onRetake() {
   if (m_cutListByTakeNum.isEmpty()) return;
 
+  const QString error = WorkflowManager::instance()->projectInfoMappingError();
+  if (!error.isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"), error);
+    return;
+  }
+
   QStringList jumpToPaths;
   // リテイク先と、カットが元いた工程グループの詳細進捗を、後で作り直す
   QStringList allCuts;

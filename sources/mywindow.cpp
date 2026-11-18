@@ -524,9 +524,8 @@ DoRefreshResult doRefreshWorkItem(const DoRefreshWorkItem& item) {
   info.sequence =
       WorkflowManager::instance()->sceneNum2Sequence(item.sceneNumber);
   // Scene Thumbnail Pathが未設定のプロジェクトでは空文字列を返す
-  info.thumbnailPath = SharedFiles::actualPath(
-      WorkflowManager::instance()->sceneThumbnailPathFor(info.sequence,
-                                                         item.sceneNumber));
+  info.thumbnailPath = WorkflowManager::instance()->sceneThumbnailPathFor(
+      info.sequence, item.sceneNumber);
 
   switch (WorkflowManager::instance()
               ->flowGroupInfos()
@@ -1823,10 +1822,12 @@ void RegisterDialog::updateButtonsEnabled() {
   for (const QString& name : cutNames())
     if (!WorkflowManager::instance()->isValidSceneName(name))
       invalidNames.append(name);
-  const bool ok = invalidNames.isEmpty();
-  m_cutNameWarningLabel->setText(
-      ok ? QString()
-         : WorkflowManager::instance()->invalidSceneNameMessage(invalidNames));
+  auto* wm              = WorkflowManager::instance();
+  const QString warning = invalidNames.isEmpty()
+                              ? wm->projectInfoMappingError()
+                              : wm->invalidSceneNameMessage(invalidNames);
+  const bool ok         = warning.isEmpty();
+  m_cutNameWarningLabel->setText(warning);
   m_cutNameWarningLabel->setVisible(!ok);
   m_moveFlowGroupButton->setEnabled(ok);
   m_registerInfoButton->setEnabled(ok);

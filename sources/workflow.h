@@ -1,5 +1,8 @@
 #pragma once
 
+#include <optional>
+#include <QDir>
+
 #include <QString>
 #include <QColor>
 #include <QList>
@@ -247,35 +250,10 @@ class WorkflowManager : public QObject {  // singleton
   QMap<FlowGroupId, QStringList> m_cutListInBranchFlow;
   QMap<ActionStepType, ActionStepInfo> m_actionStepTypeInfos;
 
-  // 進捗（progress）・進捗の詳細のキャッシュ（progress_cache）・カット情報（scene_info）の
-  // 保存先ベースフォルダ。hasEpisodes()がtrueならm_projectInfoFolderPath直下に
-  // m_currentEpisode名のサブフォルダを作り、そちらを返す
-  QString projectInfoFolderPathForCurrentEpisode() const {
-    if (m_hasEpisodes && !m_currentEpisode.isEmpty())
-      return infoFolderPath() + "/" + m_currentEpisode;
-    return infoFolderPath();
-  }
-  // 工程グループの所属（本流・傍流）を記録するフォルダ。工程グループのID名.ini
-  // が入る
-  QString progressFolderPath() const {
-    return projectInfoFolderPathForCurrentEpisode() + "/progress";
-  }
-  // 工程ごとのカットの一覧（工程グループの更新ボタンで作り直せるキャッシュ）のフォルダ。
-  // 工程グループのID名_details.ini と、その書き込み中のロックファイルが入る
-  QString progressCacheFolderPath() const {
-    return projectInfoFolderPathForCurrentEpisode() + "/progress_cache";
-  }
-  // カット情報・テイク（リテイク）の記録のフォルダ。シークエンスごとのフォルダの下に、カットごとのiniが入る
-  QString sceneInfoFolderPath() const {
-    return projectInfoFolderPathForCurrentEpisode() + "/scene_info";
-  }
-  // ログ保存先のベースフォルダ。hasEpisodes()がtrueならm_logRootPath直下に
-  // m_currentEpisode名のサブフォルダを作り、そちらを返す
-  QString logRootPathForCurrentEpisode() const {
-    if (m_hasEpisodes && !m_currentEpisode.isEmpty())
-      return logRootPath() + "/" + m_currentEpisode;
-    return logRootPath();
-  }
+  QString episodeDataPath(const QString& root, const QString& relative) const;
+  QString sceneInfoFilePath(const QString& sequence, const QString& scene,
+                            bool createFolder = false) const;
+  std::optional<QDir> progressDirectory(const QString& name) const;
 
   WorkflowManager();
 
@@ -332,6 +310,7 @@ public:
   QString infoFolderPath() const {
     return resolvePathFromStuffFolder(m_projectInfoFolderPath);
   }
+  QString projectInfoMappingError() const;
   QString infoFolderPathSetting() const { return m_projectInfoFolderPath; }
   void setInfoFolderPath(const QString& path) {
     m_projectInfoFolderPath = path;
@@ -359,10 +338,7 @@ public:
   // 現在のプロジェクトにサムネイルパスが設定されている場合のみ、指定したカットのサムネイル画像パスを解決する。
   // 設定されていない場合は空文字列を返す
   QString sceneThumbnailPathFor(const QString& sequence,
-                                const QString& sceneNumber) {
-    if (m_sceneThumbnailPath.isEmpty()) return QString();
-    return decodePath(m_sceneThumbnailPath, sequence, sceneNumber);
-  }
+                                const QString& sceneNumber);
 
   // 話数（Episode）機能
   bool hasEpisodes() const { return m_hasEpisodes; }

@@ -255,15 +255,14 @@ QString RegisterSceneDialog::computeDestinationPath() const {
 
 void RegisterSceneDialog::updateRegisterButtonEnabled() {
   const QString sceneName = m_sceneNameEdit->text().trimmed();
-  const bool nameInvalid =
-      !sceneName.isEmpty() &&
-      !WorkflowManager::instance()->isValidSceneName(sceneName);
-  m_sceneNameWarningLabel->setText(
-      nameInvalid
-          ? WorkflowManager::instance()->invalidSceneNameMessage({sceneName})
-          : QString());
-  m_sceneNameWarningLabel->setVisible(nameInvalid);
-  bool ok = !m_sceneNameEdit->text().trimmed().isEmpty() &&
+  auto* wm                = WorkflowManager::instance();
+  QString warning         = wm->projectInfoMappingError();
+  if (warning.isEmpty() && !sceneName.isEmpty() &&
+      !wm->isValidSceneName(sceneName))
+    warning = wm->invalidSceneNameMessage({sceneName});
+  m_sceneNameWarningLabel->setText(warning);
+  m_sceneNameWarningLabel->setVisible(!warning.isEmpty());
+  bool ok = warning.isEmpty() && !sceneName.isEmpty() &&
             m_protocolCombo->currentIndex() >= 0 &&
             !computeDestinationPath().isEmpty();
   if (m_copyMethodRadio->isChecked())
@@ -437,6 +436,13 @@ void RegisterSceneDialog::onRegisterClicked() {
   confirmLay->addWidget(buttonBox);
 
   if (confirmDialog.exec() != QDialog::Accepted) return;
+
+  const QString mappingError =
+      WorkflowManager::instance()->projectInfoMappingError();
+  if (!mappingError.isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"), mappingError);
+    return;
+  }
 
   bool doReplace     = replaceRadio && replaceRadio->isChecked();
   bool doAddAsBranch = addAsBranchRadio && addAsBranchRadio->isChecked();

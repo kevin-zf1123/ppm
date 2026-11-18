@@ -685,47 +685,70 @@ WorkflowManager::WorkflowManager() {
 
 WorkflowManager::~WorkflowManager() { deleteAllSceneInfoTags(); }
 
-namespace {
-// ログ・シーン情報のルートフォルダの下の、シークエンスのフォルダへ移動する。
-// sequenceが空文字列（シークエンスを使わない設定）の場合は、ルートフォルダのまま。
-// createがtrueの場合は、フォルダが無ければ作る。falseでフォルダが無い場合は、falseを返す
-bool enterSequenceFolder(QDir& dir, const QString& sequence, bool create) {
-  if (create) {
-    if (!dir.mkpath(sequence.isEmpty() ? QString(".") : sequence)) return false;
-  } else if (!dir.exists())
-    return false;
-  return sequence.isEmpty() || dir.cd(sequence);
+QString WorkflowManager::projectInfoMappingError() const {
+  if (UserSettings::instance()->mixedEnvironment() &&
+      episodeDataPath(infoFolderPath(), "progress").isEmpty())
+    return tr(
+        "The project info folder could not be resolved. Check your shared "
+        "folder mappings.");
+  return {};
 }
-QString sequenceFolderPath(const QDir& dir, const QString& sequence) {
-  return sequence.isEmpty() ? dir.path() : dir.filePath(sequence);
+
+QString WorkflowManager::episodeDataPath(const QString& root,
+                                         const QString& relative) const {
+  if (UserSettings::instance()->mixedEnvironment() && root.isEmpty()) return {};
+  const QString episode = m_hasEpisodes && !m_currentEpisode.isEmpty()
+                              ? m_currentEpisode + "/"
+                              : QString();
+  return SharedFiles::actualPath(root + "/" + episode + relative);
 }
-}  // namespace
+
+QString WorkflowManager::sceneInfoFilePath(const QString& sequence,
+                                           const QString& scene,
+                                           bool createFolder) const {
+  const QString path = episodeDataPath(
+      infoFolderPath(), "scene_info/" +
+                            (sequence.isEmpty() ? QString() : sequence + "/") +
+                            m_cutNumberPrefix + scene + ".ini");
+  if (path.isEmpty()) return {};
+  const QDir dir = QFileInfo(path).dir();
+  if (createFolder ? dir.mkpath(".") : dir.exists()) return path;
+  if (createFolder)
+    QMessageBox::critical(
+        nullptr, tr("Error"),
+        tr("Failed to access the scene info folder %1").arg(dir.path()));
+  return {};
+}
+
+QString WorkflowManager::sceneThumbnailPathFor(const QString& sequence,
+                                               const QString& sceneNumber) {
+  if (m_sceneThumbnailPath.isEmpty()) return {};
+  return SharedFiles::actualPath(
+      decodePath(m_sceneThumbnailPath, sequence, sceneNumber));
+}
 
 void WorkflowManager::logAction(const QString& sequence,
                                 const QString& cutNumber,
                                 const QString& workflow,
                                 const QString& action) {
-  if (UserSettings::instance()->mixedEnvironment() && logRootPath().isEmpty())
-    return;
-  QDir dir(logRootPathForCurrentEpisode());
-  // シークエンス名のフォルダを作る（シークエンスを使わない場合は、ルートフォルダに直接保存する）
-  if (!enterSequenceFolder(dir, sequence, true)) {
-    QMessageBox::critical(nullptr, tr("Error"),
-                          tr("Failed to access the log folder %1")
-                              .arg(sequenceFolderPath(dir, sequence)));
+  QString path = logFilePath(sequence, cutNumber);
+  if (path.isEmpty()) return;
+  // With no log folder configured, the original writer used the current
+  // directory.
+  if (m_logRootPath.isEmpty() && (!m_hasEpisodes || m_currentEpisode.isEmpty()))
+    path = QDir::current().filePath(path.mid(1));
+  const QDir dir = QFileInfo(path).dir();
+  if (!dir.mkpath(".")) {
+    QMessageBox::critical(
+        nullptr, tr("Error"),
+        tr("Failed to access the log folder %1").arg(dir.path()));
     return;
   }
-
-  QString fileName =
-      m_cutNumberPrefix + cutNumber + ".md";  // markdownで書いてみる
-
-  bool isFirstLog = !dir.exists(fileName);
-
-  QFile logFile(dir.absoluteFilePath(fileName));
+  QFile logFile(path);
+  bool isFirstLog = !logFile.exists();
   if (!logFile.open(QFile::WriteOnly | QFile::Append)) {
     QMessageBox::critical(nullptr, tr("Error"),
-                          tr("Failed to open the log file %1")
-                              .arg(dir.absoluteFilePath(fileName)));
+                          tr("Failed to open the log file %1").arg(path));
     return;
   }
 
@@ -775,20 +798,9 @@ void WorkflowManager::saveSceneInfoTag(const QString& sequence,
                                        const QString& infoTagName,
                                        const QVariant& value,
                                        const QString& actionName) {
-  if (UserSettings::instance()->mixedEnvironment() &&
-      infoFolderPath().isEmpty())
-    return;
-  QDir dir(sceneInfoFolderPath());
-  // シークエンス名のフォルダを作る
-  if (!enterSequenceFolder(dir, sequence, true)) {
-    QMessageBox::critical(nullptr, tr("Error"),
-                          tr("Failed to access the scene info folder %1")
-                              .arg(sequenceFolderPath(dir, sequence)));
-    return;
-  }
-
-  QString fileName = m_cutNumberPrefix + cutNumber + ".ini";  // blu0001.ini
-  QSettings settings(dir.absoluteFilePath(fileName), QSettings::IniFormat);
+  const QString path = sceneInfoFilePath(sequence, cutNumber, true);
+  if (path.isEmpty()) return;
+  QSettings settings(path, QSettings::IniFormat);
 
   settings.setValue(infoTagName, value);
   settings.sync();
@@ -809,20 +821,9 @@ void WorkflowManager::releaseSceneInfoTag(const QString& sequence,
                                           const QString& cutNumber,
                                           const QString& infoTagName,
                                           const QString& actionName) {
-  if (UserSettings::instance()->mixedEnvironment() &&
-      infoFolderPath().isEmpty())
-    return;
-  QDir dir(sceneInfoFolderPath());
-  // シークエンス名のフォルダを作る
-  if (!enterSequenceFolder(dir, sequence, true)) {
-    QMessageBox::critical(nullptr, tr("Error"),
-                          tr("Failed to access the scene info folder %1")
-                              .arg(sequenceFolderPath(dir, sequence)));
-    return;
-  }
-
-  QString fileName = m_cutNumberPrefix + cutNumber + ".ini";  // blu0001.ini
-  QSettings settings(dir.absoluteFilePath(fileName), QSettings::IniFormat);
+  const QString path = sceneInfoFilePath(sequence, cutNumber, true);
+  if (path.isEmpty()) return;
+  QSettings settings(path, QSettings::IniFormat);
 
   settings.remove(infoTagName);
   settings.sync();
@@ -843,35 +844,20 @@ QVariant WorkflowManager::sceneInfoTag(const QString& sequence,
                                        const QString& cutNumber,
                                        const QString& infoTagName,
                                        const QVariant& defaultValue) const {
-  if (UserSettings::instance()->mixedEnvironment() &&
-      infoFolderPath().isEmpty())
-    return defaultValue;
-  QDir dir(sceneInfoFolderPath());
-  if (!enterSequenceFolder(dir, sequence, false)) return defaultValue;
-
-  QString fileName = m_cutNumberPrefix + cutNumber + ".ini";  // blu0001.ini
-
-  if (!dir.exists(fileName)) return defaultValue;
-
-  QSettings settings(dir.absoluteFilePath(fileName), QSettings::IniFormat);
+  const QString path = sceneInfoFilePath(sequence, cutNumber);
+  if (path.isEmpty()) return defaultValue;
+  if (!QFileInfo::exists(path)) return defaultValue;
+  QSettings settings(path, QSettings::IniFormat);
 
   return settings.value(infoTagName, defaultValue);
 }
 
 const QMap<QString, QVariant> WorkflowManager::sceneInfoTags(
     const QString& sequence, const QString& cutNumber) {
-  if (UserSettings::instance()->mixedEnvironment() &&
-      infoFolderPath().isEmpty())
-    return {};
-  QDir dir(sceneInfoFolderPath());
-  if (!enterSequenceFolder(dir, sequence, false))
-    return QMap<QString, QVariant>();
-
-  QString fileName = m_cutNumberPrefix + cutNumber + ".ini";  // blu0001.ini
-
-  if (!dir.exists(fileName)) return QMap<QString, QVariant>();
-
-  QSettings settings(dir.absoluteFilePath(fileName), QSettings::IniFormat);
+  const QString path = sceneInfoFilePath(sequence, cutNumber);
+  if (path.isEmpty()) return {};
+  if (!QFileInfo::exists(path)) return {};
+  QSettings settings(path, QSettings::IniFormat);
 
   QMap<QString, QVariant> ret;
   for (auto key : settings.allKeys()) {
@@ -1241,11 +1227,9 @@ QStringList WorkflowManager::xdtsPaths(FlowGroupId id, QString sequence,
 }
 
 QString WorkflowManager::logFilePath(QString sequence, QString sceneNumber) {
-  QString fileName = m_cutNumberPrefix + sceneNumber + ".md";
-  if (UserSettings::instance()->mixedEnvironment() && logRootPath().isEmpty())
-    return {};
-  return logRootPathForCurrentEpisode() +
-         (sequence.isEmpty() ? QString() : "/" + sequence) + "/" + fileName;
+  return episodeDataPath(logRootPath(),
+                         (sequence.isEmpty() ? QString() : sequence + "/") +
+                             m_cutNumberPrefix + sceneNumber + ".md");
 }
 
 QString WorkflowManager::googleCueFilePath(QString googleCueFileName) {
@@ -1280,13 +1264,19 @@ QList<FlowGroupId> WorkflowManager::flowGroupsContainingCuts(
   return ret;
 }
 
+std::optional<QDir> WorkflowManager::progressDirectory(
+    const QString& name) const {
+  const QString path = episodeDataPath(infoFolderPath(), name);
+  if (path.isEmpty()) return {};
+  QDir dir(path);
+  if (!dir.exists()) dir.mkpath(".");
+  return dir;
+}
+
 void WorkflowManager::registerCutNames(QStringList cutNames, FlowGroupId fgId,
                                        QString actionName) {
-  if (UserSettings::instance()->mixedEnvironment() &&
-      infoFolderPath().isEmpty())
-    return;
-  QDir prjInfoFolder(progressFolderPath());
-  if (!prjInfoFolder.exists()) prjInfoFolder.mkpath(".");
+  const auto prjInfoFolder = progressDirectory("progress");
+  if (!prjInfoFolder) return;
 
   bool isRetake = m_flowGroupInfos.value(fgId).isRetakeGroup;
 
@@ -1301,7 +1291,7 @@ void WorkflowManager::registerCutNames(QStringList cutNames, FlowGroupId fgId,
 
     QString cutListSettingsName = tmpInfo.idName + ".ini";
     QSettings cutListSettings(
-        prjInfoFolder.absoluteFilePath(cutListSettingsName),
+        prjInfoFolder->absoluteFilePath(cutListSettingsName),
         QSettings::IniFormat);
 
     m_cutListInFlow[tmpFgId] = cutListSettings.value("cutList").toStringList();
@@ -1336,15 +1326,13 @@ void WorkflowManager::registerCutNameToBranchFlowGroup(QStringList cutNames,
                                                        FlowGroupId fgId,
                                                        bool isAdd,
                                                        QString actionName) {
-  if (UserSettings::instance()->mixedEnvironment() &&
-      infoFolderPath().isEmpty())
-    return;
-  QDir prjInfoFolder(progressFolderPath());
-  if (!prjInfoFolder.exists()) prjInfoFolder.mkpath(".");
+  const auto prjInfoFolder = progressDirectory("progress");
+  if (!prjInfoFolder) return;
 
   QString cutListSettingsName = m_flowGroupInfos[fgId].idName + ".ini";
-  QSettings cutListSettings(prjInfoFolder.absoluteFilePath(cutListSettingsName),
-                            QSettings::IniFormat);
+  QSettings cutListSettings(
+      prjInfoFolder->absoluteFilePath(cutListSettingsName),
+      QSettings::IniFormat);
   m_cutListInBranchFlow[fgId] =
       cutListSettings.value("cutList_branch").toStringList();
 
@@ -1389,15 +1377,12 @@ void WorkflowManager::loadCutList() {
   // カットリスト読み込み
   m_cutListInFlow.clear();
   m_cutListInBranchFlow.clear();
-  if (UserSettings::instance()->mixedEnvironment() &&
-      infoFolderPath().isEmpty())
-    return;
-  QDir prjInfoFolder(progressFolderPath());
-  if (!prjInfoFolder.exists()) prjInfoFolder.mkpath(".");
+  const auto prjInfoFolder = progressDirectory("progress");
+  if (!prjInfoFolder) return;
   for (auto fgId : m_flowGroupInfos.keys()) {
     QString cutListSettingsName = m_flowGroupInfos[fgId].idName + ".ini";
     QSettings cutListSettings(
-        prjInfoFolder.absoluteFilePath(cutListSettingsName),
+        prjInfoFolder->absoluteFilePath(cutListSettingsName),
         QSettings::IniFormat);
     m_cutListInFlow[fgId] = cutListSettings.value("cutList").toStringList();
     m_cutListInFlow[fgId].sort(Qt::CaseInsensitive);
@@ -1436,20 +1421,12 @@ QString WorkflowManager::decodeConditionPathForToolTip(QString path) {
 
 // 現在のテイク番号を返す
 int WorkflowManager::currentTake(const QString sceneNumber) const {
-  if (UserSettings::instance()->mixedEnvironment() &&
-      infoFolderPath().isEmpty())
-    return -1;
-  QDir dir(sceneInfoFolderPath());
-
-  QString sequence = sceneNum2Sequence(sceneNumber);
   if (!isValidSceneName(sceneNumber)) return -1;
-  if (!enterSequenceFolder(dir, sequence, false)) return -1;
-
-  QString fileName = m_cutNumberPrefix + sceneNumber + ".ini";  // blu0001.ini
-
-  if (!dir.exists(fileName)) return 1;
-
-  QSettings settings(dir.absoluteFilePath(fileName), QSettings::IniFormat);
+  const QString sequence = sceneNum2Sequence(sceneNumber);
+  const QString path     = sceneInfoFilePath(sequence, sceneNumber);
+  if (path.isEmpty()) return -1;
+  if (!QFileInfo::exists(path)) return 1;
+  QSettings settings(path, QSettings::IniFormat);
   if (settings.childGroups().contains("RetakeInfo")) {
     settings.beginGroup("RetakeInfo");
     return settings.value("CurrentTake", 1).toInt();
@@ -1493,17 +1470,9 @@ bool WorkflowManager::doRetake(const QString sceneNumber, const int takeNum,
                                const QString comment) {
   QString sequence = sceneNum2Sequence(sceneNumber);
   if (!isValidSceneName(sceneNumber)) return false;
-  if (UserSettings::instance()->mixedEnvironment() &&
-      infoFolderPath().isEmpty())
-    return false;
-  QDir dir(sceneInfoFolderPath() +
-           (sequence.isEmpty() ? QString() : "/" + sequence));
-  if (!dir.exists())
-    if (!dir.mkpath(".")) return false;
-
-  QString fileName = m_cutNumberPrefix + sceneNumber + ".ini";  // blu0001.ini
-
-  QSettings settings(dir.absoluteFilePath(fileName), QSettings::IniFormat);
+  const QString path = sceneInfoFilePath(sequence, sceneNumber, true);
+  if (path.isEmpty()) return false;
+  QSettings settings(path, QSettings::IniFormat);
   settings.beginGroup("RetakeInfo");
   settings.setValue("CurrentTake", takeNum);
   settings.beginGroup(
@@ -1536,20 +1505,12 @@ QVariantMap WorkflowManager::obtainRetakeInfo(const QString sceneNumber,
                                               int takeNum) const {
   QVariantMap ret;
 
-  if (UserSettings::instance()->mixedEnvironment() &&
-      infoFolderPath().isEmpty())
-    return {};
-  QDir dir(sceneInfoFolderPath());
-
-  QString sequence = sceneNum2Sequence(sceneNumber);
   if (!isValidSceneName(sceneNumber)) return ret;
-  if (!enterSequenceFolder(dir, sequence, false)) return ret;
-
-  QString fileName = m_cutNumberPrefix + sceneNumber + ".ini";  // blu0001.ini
-
-  if (!dir.exists(fileName)) return ret;
-
-  QSettings settings(dir.absoluteFilePath(fileName), QSettings::IniFormat);
+  const QString sequence = sceneNum2Sequence(sceneNumber);
+  const QString path     = sceneInfoFilePath(sequence, sceneNumber);
+  if (path.isEmpty()) return ret;
+  if (!QFileInfo::exists(path)) return ret;
+  QSettings settings(path, QSettings::IniFormat);
   settings.beginGroup("RetakeInfo");
 
   if (takeNum < 0) takeNum = settings.value("CurrentTake").toInt();
@@ -1572,15 +1533,15 @@ QVariantMap WorkflowManager::obtainRetakeInfo(const QString sceneNumber,
 void WorkflowManager::getProgressSettingsFilePath(const FlowGroupId fgId,
                                                   QString& settingsPath,
                                                   QString& lockPath) {
-  if (UserSettings::instance()->mixedEnvironment() &&
-      infoFolderPath().isEmpty())
+  const auto prjInfoFolder = progressDirectory("progress_cache");
+  if (!prjInfoFolder) {
+    settingsPath.clear();
+    lockPath.clear();
     return;
-  QDir prjInfoFolder(progressCacheFolderPath());
-  QString progressSettingsName = m_flowGroupInfos[fgId].idName + "_details.ini";
-  QString lockFileName = m_flowGroupInfos[fgId].idName + "_details.lock";
-  prjInfoFolder.mkpath(".");
-  settingsPath = prjInfoFolder.absoluteFilePath(progressSettingsName);
-  lockPath     = prjInfoFolder.absoluteFilePath(lockFileName);
+  }
+  const QString base = m_flowGroupInfos[fgId].idName + "_details";
+  settingsPath       = prjInfoFolder->absoluteFilePath(base + ".ini");
+  lockPath           = prjInfoFolder->absoluteFilePath(base + ".lock");
 }
 
 void WorkflowManager::saveProgressList(
