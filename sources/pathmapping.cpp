@@ -9,6 +9,12 @@ QString prefix(QString path) {
   return path;
 }
 
+bool equivalent(const QString& a, const QString& b) {
+  return a.normalized(QString::NormalizationForm_C)
+             .compare(b.normalized(QString::NormalizationForm_C),
+                      Qt::CaseInsensitive) == 0;
+}
+
 // Compare components, so Unicode normalization never changes the offset used
 // to append the original suffix. Preserve the two leading separators of UNC.
 bool substitute(const QString& path, const QString& from, const QString& to,
@@ -23,11 +29,7 @@ bool substitute(const QString& path, const QString& from, const QString& to,
   }
   if (parts.size() < wanted.size()) return false;
   for (int i = 0; i < wanted.size(); ++i)
-    if (parts[i]
-            .normalized(QString::NormalizationForm_C)
-            .compare(wanted[i].normalized(QString::NormalizationForm_C),
-                     Qt::CaseInsensitive) != 0)
-      return false;
+    if (!equivalent(parts[i], wanted[i])) return false;
   result               = separators(to);
   const QString suffix = parts.mid(wanted.size()).join('/');
   if (!suffix.isEmpty()) {
@@ -81,11 +83,7 @@ QStringList PathMappings::storedCandidates(const QString& local) const {
     for (const auto& row : rows) {
       QString candidate;
       if (substitute(local, row.local, row.stored, candidate) &&
-          prefix(toLocal(candidate))
-                  .normalized(QString::NormalizationForm_C)
-                  .compare(
-                      prefix(local).normalized(QString::NormalizationForm_C),
-                      Qt::CaseInsensitive) == 0 &&
+          equivalent(prefix(toLocal(candidate)), prefix(local)) &&
           !candidates.contains(candidate))
         candidates.append(candidate);
     }
@@ -95,13 +93,9 @@ QStringList PathMappings::storedCandidates(const QString& local) const {
 
 bool PathMappings::accepts(const PathMapping& row) const {
   if (!isAbsolute(row.stored) || !isAbsolute(row.local)) return false;
-  const QString key =
-      prefix(row.stored).normalized(QString::NormalizationForm_C);
+  const QString key = prefix(row.stored);
   for (const auto& previous : rows)
-    if (key.compare(
-            prefix(previous.stored).normalized(QString::NormalizationForm_C),
-            Qt::CaseInsensitive) == 0)
-      return false;
+    if (equivalent(key, prefix(previous.stored))) return false;
   return true;
 }
 

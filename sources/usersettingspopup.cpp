@@ -212,19 +212,14 @@ void UserSettingsPopup::editMappings() {
   table->setHorizontalHeaderLabels(
       {tr("Stored project prefix"), tr("Local folder prefix")});
   table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+#if defined(Q_OS_MACOS) && QT_VERSION <= QT_VERSION_CHECK(6, 12, 0)
+  // QTBUG-149612: Cocoa can retain a deleted accessible selected cell.
+  // Editing and Remove use the current cell independently of selection.
+  table->setSelectionMode(QAbstractItemView::NoSelection);
+#else
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
+#endif
   layout->addWidget(table);
-  auto populate = [table](const PathMappings& mappings) {
-    table->setRowCount(0);
-    for (const auto& pair : mappings.rows) {
-      int row = table->rowCount();
-      table->insertRow(row);
-      table->setItem(row, 0, new QTableWidgetItem(pair.stored));
-      table->setItem(row, 1, new QTableWidgetItem(pair.local));
-    }
-  };
-  populate(inherit->isChecked() ? settings->defaultMappings()
-                                : settings->personalMappings());
   auto* buttons =
       new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   auto* editButtons = new QHBoxLayout();
@@ -234,17 +229,21 @@ void UserSettingsPopup::editMappings() {
   editButtons->addWidget(remove);
   editButtons->addStretch();
   layout->addLayout(editButtons);
-  auto enableEditing = [=](bool defaults) {
+  auto showMappings = [=](bool defaults) {
+    const auto& rows =
+        (defaults ? settings->defaultMappings() : settings->personalMappings())
+            .rows;
+    table->setRowCount(rows.size());
+    for (int row = 0; row < rows.size(); ++row) {
+      table->setItem(row, 0, new QTableWidgetItem(rows[row].stored));
+      table->setItem(row, 1, new QTableWidgetItem(rows[row].local));
+    }
     table->setEnabled(!defaults);
     add->setEnabled(!defaults);
     remove->setEnabled(!defaults);
   };
-  enableEditing(inherit->isChecked());
-  connect(inherit, &QCheckBox::toggled, &dialog, [=](bool defaults) {
-    populate(defaults ? settings->defaultMappings()
-                      : settings->personalMappings());
-    enableEditing(defaults);
-  });
+  connect(inherit, &QCheckBox::toggled, &dialog, showMappings);
+  showMappings(inherit->isChecked());
   connect(add, &QPushButton::clicked, &dialog, [table]() {
     int row = table->rowCount();
     table->insertRow(row);

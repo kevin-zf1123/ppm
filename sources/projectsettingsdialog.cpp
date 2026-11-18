@@ -77,10 +77,8 @@ const PathMappings& mappings() {
   return UserSettings::instance()->pathMappings();
 }
 
-QString pathTip(const QString& stored) {
+QString pathTip(const QString& stored, bool matched) {
   if (mappings().rows.isEmpty() || !PathMappings::isAbsolute(stored)) return {};
-  bool matched;
-  mappings().toLocal(stored, &matched);
   return matched ? QObject::tr("Stored path: %1").arg(stored)
                  : QObject::tr(
                        "No mapping for this absolute path on this machine: %1")
@@ -91,12 +89,13 @@ template <class Field>
 void showProjectPath(Field* field, const QString& stored) {
   if (!field->property("originalPathHelp").isValid())
     field->setProperty("originalPathHelp", field->toolTip());
+  bool matched;
+  const QString local = mappings().toLocal(stored, &matched);
   QStringList help{field->property("originalPathHelp").toString(),
-                   pathTip(stored)};
+                   pathTip(stored, matched)};
   help.removeAll(QString());
   field->setToolTip(help.join("\n"));
-  if (field->text() != mappings().toLocal(stored))
-    field->setText(mappings().toLocal(stored));
+  if (field->text() != local) field->setText(local);
 }
 
 QString editedProjectPath(QWidget* parent, const QString& original,
@@ -137,8 +136,9 @@ QString readProjectPath(Field* field, const QString& stored) {
 }
 
 void showProjectPath(QTableWidgetItem* item, const QString& stored) {
-  item->setText(mappings().toLocal(stored));
-  item->setToolTip(pathTip(stored));
+  bool matched;
+  item->setText(mappings().toLocal(stored, &matched));
+  item->setToolTip(pathTip(stored, matched));
 }
 
 QTableWidgetItem* pathItemFor(const QString& stored) {
@@ -2304,9 +2304,12 @@ void buildStepMacroLineField(
   if (suggestionProvider)
     fl->addRow(label, wrapWithSuggestButton(
                           parentWidget, edit, suggestionProvider,
-                          [editor, paramIndex, edit,
+                          [editor, paramIndex, edit, pathField,
                            onChanged](const QString& chosen) {
-                            showProjectPath(edit, chosen);
+                            if (pathField)
+                              showProjectPath(edit, chosen);
+                            else
+                              edit->setText(chosen);
                             editor([paramIndex, chosen](ActionStep& s) {
                               ensureParamSize(s, paramIndex);
                               s.params[paramIndex] = chosen;
