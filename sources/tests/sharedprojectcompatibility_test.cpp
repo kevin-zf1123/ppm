@@ -4,6 +4,7 @@
 #include "projectsettings_common.h"
 #include "projectsettingsdialog.h"
 #include "sharedfiles.h"
+#include "registerscenedialog.h"
 #include "usersettings.h"
 
 #include <QFile>
@@ -16,6 +17,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QInputDialog>
 #include <QStandardPaths>
 #include <QTemporaryDir>
@@ -37,6 +39,32 @@ class SharedProjectCompatibilityTest : public QObject {
   static bool write(const QString& path, const QByteArray& data) {
     QFile file(path);
     return file.open(QIODevice::WriteOnly) && file.write(data) == data.size();
+  }
+
+  void checkRestart(const QString& mode, const QString& local,
+                    const QString& personal) {
+    QCOMPARE(QProcess::execute(
+                 QCoreApplication::applicationFilePath(),
+                 {"--mapping-settings", QCoreApplication::applicationName(),
+                  mode, stored, local, personal}),
+             0);
+  }
+
+  void configureLayout(const QString& condition = "[ROOT]/[CUTNUMBER].clip",
+                       FlowGroupInfo::TakeNotationStyle style =
+                           FlowGroupInfo::TakeNotation_None) {
+    auto* wm = WorkflowManager::instance();
+    wm->setProjectRootPath(stored);
+    wm->setInfoFolderPath(stored + "/info");
+    wm->setLogRootPath(stored + "/logs");
+    wm->setUseSequence(false);
+    FlowGroupInfo group;
+    group.idName            = "Layout";
+    group.takeNotationStyle = style;
+    wm->setFlowGroupInfos({{0, group}});
+    Workflow wf{0, 0, "Layout", Qt::white};
+    wf.protocols = {{Digital, condition, {}}};
+    wm->setWorkflows({wf});
   }
 
 private slots:
@@ -70,13 +98,7 @@ private slots:
     // A platform mapping without an explicit opt-in must leave Windows-only
     // studios on the normal filesystem path, including after an upgrade.
     QVERIFY(write(root.filePath(QStringLiteral("ガ.lookup")), "cue"));
-    QProcess plain;
-    plain.start(QCoreApplication::applicationFilePath(),
-                {"--mapping-settings", QCoreApplication::applicationName(),
-                 "off", stored, stored, root.path()});
-    QVERIFY(plain.waitForFinished());
-    QCOMPARE(plain.exitStatus(), QProcess::NormalExit);
-    QCOMPARE(plain.exitCode(), 0);
+    checkRestart("off", stored, root.path());
     ini.setValue("UserSettings/MixedEnvironment", true);
     ini.sync();
     QCOMPARE(UserSettings::instance()->pathMappings().toLocal(stored),
@@ -126,41 +148,23 @@ private slots:
              root.filePath("personal"));
     // Each child starts PPM with the settings just written to disk. Switching
     // back to personal mappings must restore the saved prefix after a restart.
-    auto restart = [&](const QString& mode, const QString& local) {
-      QProcess child;
-      child.start(QCoreApplication::applicationFilePath(),
-                  {"--mapping-settings", QCoreApplication::applicationName(),
-                   mode, stored, local, root.filePath("personal")});
-      QVERIFY(child.waitForFinished());
-      QCOMPARE(child.exitStatus(), QProcess::NormalExit);
-      QCOMPARE(child.exitCode(), 0);
-    };
-    restart("on", root.path());
+    checkRestart("on", root.path(), root.filePath("personal"));
     user->setPathMappings(user->personalMappings(), false);
-    restart("on", root.filePath("personal"));
+    checkRestart("on", root.filePath("personal"), root.filePath("personal"));
     user->setMixedEnvironment(false);
-    restart("off", stored);
+    checkRestart("off", stored, root.filePath("personal"));
     user->setMixedEnvironment(true);
     user->setPathMappings({}, false);
-    restart("on", stored);
+    checkRestart("on", stored, root.filePath("personal"));
     user->setPathMappings({}, true);
   }
 
   void projectEditorAndScan() {
     auto* wm = WorkflowManager::instance();
-    wm->setProjectRootPath(stored);
-    wm->setInfoFolderPath(stored + "/info");
-    wm->setLogRootPath(stored + "/logs");
+    configureLayout();
     wm->setSceneThumbnailPath("[ROOT]/[CUTNUMBER].png");
-    wm->setUseSequence(false);
     wm->setProjectTitle("Title");
     wm->setPathMacros({{"[HIDDEN]", stored + "/private", {}, true}});
-    FlowGroupInfo group;
-    group.idName = "Layout";
-    wm->setFlowGroupInfos({{0, group}});
-    Workflow wf{0, 0, "Layout", Qt::white};
-    wf.protocols = {{Digital, "[ROOT]/[CUTNUMBER].clip", {}}};
-    wm->setWorkflows({wf});
     QVERIFY(wm->saveProject("shared"));
     QVERIFY(wm->loadProject("shared"));
     refreshTmpSettingsFromProject();
@@ -246,17 +250,8 @@ private slots:
   }
 
   void rewindOnMappedShare() {
-    auto* wm = WorkflowManager::instance();
-    wm->setProjectRootPath(stored);
-    wm->setInfoFolderPath(stored + "/info");
-    wm->setLogRootPath(stored + "/logs");
-    FlowGroupInfo group;
-    group.idName            = "Layout";
-    group.takeNotationStyle = FlowGroupInfo::TakeNotation_Rewind;
-    wm->setFlowGroupInfos({{0, group}});
-    Workflow wf{0, 0, "Layout", Qt::white};
-    wf.protocols = {{Digital, "[ROOT]/rewind/[CUTNUMBER][R].clip", {}}};
-    wm->setWorkflows({wf});
+    configureLayout("[ROOT]/rewind/[CUTNUMBER][R].clip",
+                    FlowGroupInfo::TakeNotation_Rewind);
     QString cue = root.filePath("rewind/0002.clip");
     QVERIFY(QDir().mkpath(root.filePath("rewind")));
     QVERIFY(write(cue, "drawing"));
@@ -311,6 +306,32 @@ private slots:
              QFileInfo(alias).exists());
   }
 
+  void mappedCopyPreservesSource() {
+    const QString dir = root.filePath("alias-copy");
+    QVERIFY(QDir().mkpath(dir));
+    const QString source = dir + "/drawing.clip";
+    QVERIFY(write(source, "drawing"));
+    StepExecutor_CopyFolderContents copy(
+        0,
+        {Step_CopyFolderContents,
+         {"[ALL_WITHOUT_UI][OVERWRITE]", stored + "/alias-copy", dir}},
+        source, {}, "0001", false, true);
+    QString log;
+    QVariant record;
+    QVERIFY(!copy.execute(log, record));
+    QFile original(source);
+    QVERIFY(original.open(QIODevice::ReadOnly));
+    QCOMPARE(original.readAll(), "drawing");
+    for (const QString mode : {"[SKIP_EXISTING]", "[OVERWRITE_IF_NEWER]"}) {
+      StepExecutor_CopyFolderContents skip(
+          0,
+          {Step_CopyFolderContents,
+           {"[ALL_WITHOUT_UI]" + mode, stored + "/alias-copy", dir}},
+          source, {}, "0001", false, true);
+      QVERIFY2(skip.execute(log, record), qPrintable(log));
+    }
+  }
+
   void unavailableForeignRoot() {
     auto* wm = WorkflowManager::instance();
 #ifdef Q_OS_WIN
@@ -329,6 +350,19 @@ private slots:
     wm->getProgressSettingsFilePath(0, settingsFile, lock);
     QVERIFY(settingsFile.isEmpty());
     QVERIFY(lock.isEmpty());
+
+    configureLayout();
+    wm->setInfoFolderPath(foreign);
+    RegisterSceneDialog dialog(0);
+    dialog.findChild<QLineEdit*>()->setText("0023");
+    for (auto* radio : dialog.findChildren<QRadioButton*>())
+      if (radio->text().contains("empty")) radio->click();
+    const auto buttons = dialog.findChildren<QPushButton*>();
+    const auto reg =
+        std::find_if(buttons.begin(), buttons.end(),
+                     [](auto* button) { return button->text() == "Register"; });
+    QVERIFY(reg != buttons.end());
+    QVERIFY(!(*reg)->isEnabled());
   }
 
   // Move, Ask Delete and undoing Create Empty Folder all treat a folder
@@ -351,7 +385,8 @@ private slots:
     QVERIFY(SetFileAttributesW(reinterpret_cast<LPCWSTR>(hidden.utf16()),
                                FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM));
 #else
-    QVERIFY(write(dir + "/.hidden", "hidden"));
+    QVERIFY(QDir().mkpath(dir + "/.hidden"));
+    QVERIFY(write(dir + "/.hidden/content", "hidden subtree"));
 #endif
     QString log;
     QVariant record;
@@ -370,6 +405,8 @@ private slots:
           false);
       std::unique_ptr<QWidget> options(remove.createWidget());
       QVERIFY2(remove.execute(log, record), qPrintable(log));
+      QVERIFY(!remove.execute(log, record));  // vanished since confirmation
+
     } else {
       // A drawing added after folder creation must survive undo. Once the
       // drawing is removed, the same undo can clean up the remaining metadata.
@@ -406,6 +443,31 @@ private slots:
     auto scope = next.use();
     QCOMPARE(SharedFiles::actualPath(lookup),
              dir + "/" + QDir(dir).entryList(QDir::Files).first());
+  }
+
+  void japaneseSceneFiles() {
+    configureLayout();
+    auto* wm = WorkflowManager::instance();
+    const QString kana =
+        QStringLiteral("ガ").normalized(QString::NormalizationForm_D);
+    wm->setCutNumberPrefix(kana);
+    wm->setSceneThumbnailPath("[ROOT]/[PREFIX][CUTNUMBER].png");
+    QVERIFY(write(root.filePath("ガ0015.png"), "image"));
+    const QString thumb =
+        QDir(root.path()).entryList({"*0015.png"}, QDir::Files).value(0);
+    QCOMPARE(wm->sceneThumbnailPathFor({}, "0015"), root.filePath(thumb));
+    QDir logs(root.filePath("logs")), info(root.filePath("info/scene_info"));
+    QVERIFY(logs.mkpath(".") && info.mkpath("."));
+    QVERIFY(write(logs.filePath("ガ0015.md"), "first line\n"));
+    QVERIFY(write(info.filePath("ガ0015.ini"), "[General]\nNote=previous\n"));
+    wm->logAction({}, "0015", "layout", "review");
+    QCOMPARE(logs.entryList({"*0015.md"}, QDir::Files).size(), 1);
+    QCOMPARE(wm->logFilePath({}, "0015"),
+             logs.filePath(logs.entryList({"*0015.md"}, QDir::Files).first()));
+    QCOMPARE(wm->sceneInfoTag({}, "0015", "Note", {}).toString(), "previous");
+    wm->saveSceneInfoTag({}, "0015", "Note", "updated");
+    QCOMPARE(info.entryList({"*0015.ini"}, QDir::Files).size(), 1);
+    QCOMPARE(wm->sceneInfoTags({}, "0015").value("Note").toString(), "updated");
   }
 
   void equivalentSpellings() {
