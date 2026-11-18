@@ -60,10 +60,6 @@ Action : %2</source>
         <source>Are you sure ?</source>
         <translation>よろしいですか ?</translation>
     </message>
-    <message>
-        <source>The condition path is ambiguous or unavailable.</source>
-        <translation>条件パスを特定できません。パスの設定とファイル名を確認してください。</translation>
-    </message>
 </context>
 <context>
     <name>AsynchronousUndoButton</name>
@@ -346,6 +342,10 @@ Do not change this in the middle of production: the existing logs and scene info
 </context>
 <context>
     <name>ConfirmationDialog</name>
+    <message>
+        <source>The condition path is ambiguous or unavailable.</source>
+        <translation>条件パスを特定できません。パスの設定とファイル名を確認してください。</translation>
+    </message>
     <message>
         <location filename="../actionconfirmationdialog.cpp" line="4241"/>
         <location filename="../actionconfirmationdialog.cpp" line="4247"/>
@@ -2982,10 +2982,6 @@ Rewind to: %3</source>
         <source>Are you sure ?</source>
         <translation>よろしいですか ?</translation>
     </message>
-    <message>
-        <source>The condition path is ambiguous or unavailable.</source>
-        <translation>条件パスを特定できません。パスの設定とファイル名を確認してください。</translation>
-    </message>
 </context>
 <context>
     <name>RewindDestinationDialog</name>
@@ -3635,6 +3631,12 @@ The undo operation cannot restore them.</source>
 </context>
 <context>
     <name>StepExecutor_CopyFolderContents</name>
+    <message>
+        <source>The source and destination are the same file: %1
+</source>
+        <translation>コピー元とコピー先が同じファイルです：%1
+</translation>
+    </message>
     <message>
         <location filename="../actionconfirmationdialog.cpp" line="1373"/>
         <source>Source: %1</source>
@@ -5495,6 +5497,10 @@ Do you want to delete the workflow group?</source>
 </context>
 <context>
     <name>WorkflowManager</name>
+    <message>
+        <source>The project info folder could not be resolved. Check your shared folder mappings.</source>
+        <translation>プロジェクト情報フォルダーのパスを解決できません。共有フォルダーのマッピングを確認してください。</translation>
+    </message>
     <message>
         <source>Rewind:WIP</source>
         <translation type="vanished">工程内リテイク：作業中</translation>

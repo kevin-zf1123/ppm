@@ -104,19 +104,25 @@ bool isMetadata(const QFileInfo& entry) {
 Cleanup removeEmptyFolder(const QString& path, EmptyFolderPolicy policy) {
   if (path.isEmpty() || QFileInfo(path).isSymLink()) return Cleanup::Kept;
   QDir dir(path);
-  if (policy == EmptyFolderPolicy::IgnoreHiddenAndSystem) {
-    // main ignores hidden/system entries when determining whether a moved
-    // folder can be removed. Also recognize Finder files visible over SMB.
-    for (const auto& entry : dir.entryInfoList(
-             QDir::AllEntries | QDir::NoDotAndDotDot, QDir::Unsorted))
-      if (!isMetadata(entry)) return Cleanup::Kept;
-    return dir.removeRecursively() ? Cleanup::Removed : Cleanup::Failed;
-  }
-  const auto entries = dir.entryInfoList(allEntries, QDir::Unsorted);
-  for (const auto& entry : entries)
+  if (!dir.exists()) return Cleanup::Failed;
+  const auto entries      = dir.entryInfoList(allEntries, QDir::Unsorted);
+  const bool ignoreHidden = policy == EmptyFolderPolicy::IgnoreHiddenAndSystem;
+  // Take the deletion list first. A new visible file must make the final rmdir
+  // fail.
+  const auto visible =
+      ignoreHidden ? dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot,
+                                       QDir::Unsorted)
+                   : entries;
+  for (const auto& entry : visible)
     if (!isMetadata(entry)) return Cleanup::Kept;
-  for (const auto& entry : entries)
-    if (!QFile::remove(entry.filePath())) return Cleanup::Failed;
+  for (const auto& entry : entries) {
+    // An already hidden directory is part of the ignored contents. Never
+    // recursively delete the visible parent after checking its contents.
+    const bool removed = entry.isDir() && !entry.isSymLink()
+                             ? QDir(entry.filePath()).removeRecursively()
+                             : QFile::remove(entry.filePath());
+    if (!removed) return Cleanup::Failed;
+  }
   return QDir().rmdir(path) ? Cleanup::Removed : Cleanup::Failed;
 }
 }  // namespace SharedFiles

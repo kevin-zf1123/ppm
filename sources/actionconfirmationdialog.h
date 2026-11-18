@@ -11,6 +11,7 @@
 
 class QListWidget;
 class QButtonGroup;
+class QVBoxLayout;
 class QComboBox;
 class QLabel;
 class QTreeWidgetItem;
@@ -712,6 +713,7 @@ protected:
   bool m_isUndo;
   bool m_isCanceled;
   bool m_invalidConditionPath = false;
+  void finishLayout(QVBoxLayout* layout, QPushButton* ok, QPushButton* cancel);
 
   QList<QList<StepExecutor*>> m_stepExecutors;
 

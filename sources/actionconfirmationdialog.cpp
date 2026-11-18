@@ -1879,6 +1879,7 @@ bool StepExecutor_CopyFolderContents::execute_do(QString& log,
       int destIndex;
       const PlanItem* item;
       QString display;
+      QString source, destination;
     };
     QList<Conflict> conflicts;
     for (int di = 0; di < destinations.size(); di++) {
@@ -1891,7 +1892,8 @@ bool StepExecutor_CopyFolderContents::execute_do(QString& log,
         if (unresolvedSharedPath(dest, log) || unresolvedSharedPath(src, log))
           return false;
         if (!item.isDir && QFileInfo::exists(dest))
-          conflicts.append({di, &item, d.display + "/" + item.toRel});
+          conflicts.append(
+              {di, &item, d.display + "/" + item.toRel, src, dest});
       }
     }
 
@@ -1934,11 +1936,8 @@ bool StepExecutor_CopyFolderContents::execute_do(QString& log,
         break;
       case Options::Conflict_OverwriteIfNewer:
         // コピー元の方が新しい場合だけ上書きする
-        skip = !(QFileInfo(fromDir.absoluteFilePath(c.item->fromRel))
-                     .lastModified() >
-                 QFileInfo(QDir::cleanPath(destinations[c.destIndex].path +
-                                           "/" + c.item->toRel))
-                     .lastModified());
+        skip = QFileInfo(c.source).lastModified() <=
+               QFileInfo(c.destination).lastModified();
         break;
       default:
         break;
@@ -1947,6 +1946,11 @@ bool StepExecutor_CopyFolderContents::execute_do(QString& log,
         conflictSkipKeys.insert(QString::number(c.destIndex) + "|" +
                                 c.item->toRel);
         conflictSkippedFromRel.insert(c.item->fromRel);
+      } else if (UserSettings::instance()->mixedEnvironment() &&
+                 SharedFiles::sameEntry(c.source, c.destination)) {
+        log += tr("The source and destination are the same file: %1\n")
+                   .arg(c.item->fromRel);
+        return false;
       }
     }
   }
@@ -4499,18 +4503,7 @@ ActionConfirmationDialog::ActionConfirmationDialog(ActionInfo actionInfo,
     }
     mainLay->addLayout(buttonsLay);
   }
-  setLayout(mainLay);
-
-  if (m_invalidConditionPath) {
-    okButton->setEnabled(false);
-    mainLay->addWidget(new QLabel(
-        tr("The condition path is ambiguous or unavailable."), this));
-  }
-  connect(okButton, SIGNAL(clicked()), this, SLOT(onOkClicked()));
-  connect(cancelButton, &QPushButton::clicked, [&]() {
-    m_isCanceled = true;
-    accept();
-  });
+  finishLayout(mainLay, okButton, cancelButton);
 }
 
 ActionConfirmationDialog::ActionConfirmationDialog(
@@ -4644,18 +4637,7 @@ ActionConfirmationDialog::ActionConfirmationDialog(
     }
     mainLay->addLayout(buttonsLay);
   }
-  setLayout(mainLay);
-
-  if (m_invalidConditionPath) {
-    okButton->setEnabled(false);
-    mainLay->addWidget(new QLabel(
-        tr("The condition path is ambiguous or unavailable."), this));
-  }
-  connect(okButton, SIGNAL(clicked()), this, SLOT(onOkClicked()));
-  connect(cancelButton, &QPushButton::clicked, [&]() {
-    m_isCanceled = true;
-    accept();
-  });
+  finishLayout(mainLay, okButton, cancelButton);
 }
 //--------------------------------------------------
 
@@ -4809,7 +4791,30 @@ StepExecutor* ConfirmationDialog::createExecutor(
   return executor;
 }
 
+void ConfirmationDialog::finishLayout(QVBoxLayout* mainLay,
+                                      QPushButton* okButton,
+                                      QPushButton* cancelButton) {
+  setLayout(mainLay);
+
+  if (m_invalidConditionPath) {
+    okButton->setEnabled(false);
+    mainLay->addWidget(new QLabel(
+        tr("The condition path is ambiguous or unavailable."), this));
+  }
+  connect(okButton, &QPushButton::clicked, this,
+          &ConfirmationDialog::onOkClicked);
+  connect(cancelButton, &QPushButton::clicked, this, [this]() {
+    m_isCanceled = true;
+    accept();
+  });
+}
+
 void ConfirmationDialog::onOkClicked() {
+  const QString error = WorkflowManager::instance()->projectInfoMappingError();
+  if (!error.isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"), error);
+    return;
+  }
   m_isCanceled = false;
   // bool ok = true;
 
@@ -5122,16 +5127,5 @@ RewindConfirmationDialog::RewindConfirmationDialog(
     }
     mainLay->addLayout(buttonsLay);
   }
-  setLayout(mainLay);
-
-  if (m_invalidConditionPath) {
-    okButton->setEnabled(false);
-    mainLay->addWidget(new QLabel(
-        tr("The condition path is ambiguous or unavailable."), this));
-  }
-  connect(okButton, SIGNAL(clicked()), this, SLOT(onOkClicked()));
-  connect(cancelButton, &QPushButton::clicked, [&]() {
-    m_isCanceled = true;
-    accept();
-  });
+  finishLayout(mainLay, okButton, cancelButton);
 }
