@@ -123,6 +123,8 @@ macOS の試験的なビルドでは、外部アプリの起動と「フォル�
 ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag|confirmation|sharedprojectcompatibility|macos_operations)_tests$' --output-on-failure
 ```
 
+共有プロジェクトのテスト（`ppm_sharedprojectcompatibility_tests`）は、設定の優先順位と再起動後の反映、パスの変換と保存、濁点を含むファイル名の照合、コピー・工程内リテイク・取り消しを検証します。通常はシステムの一時フォルダにテスト用プロジェクトを作ります。共有ボリュームで試すには、CTest を実行する前に環境変数 `PPM_TEST_VOLUME` に、そのボリューム上の書き込み可能な既存フォルダを指定してください。テストはその中に専用の一時フォルダを作り、終了時に削除します。
+
 GitHub Actions は、Qt 6.12 を使って Windows x64 と macOS arm64 で PPM をビルドします。両方の環境で、設定ファイルの検索、Stuff フォルダのパス、ユーザー設定の保存先、終了時のカット情報タグの破棄、承認・工程内リテイク操作の確定とキャンセルを検証します。macOS では、テスト用アプリでのファイルのオープン、OpenToonz 用の引数の受け渡し、ZIP の作成と取り消しも検証します。
 
 ### CI アプリパッケージのダウンロード

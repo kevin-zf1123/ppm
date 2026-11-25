@@ -69,6 +69,7 @@ XdtsViewerBinaryPath=
 | キー | 環境設定の項目 |
 |---|---|
 | `LanguageCode` | **言語**。翻訳ファイル `PPM_ja.qm` の `ja` の部分を書きます。空にすると英語です。 |
+| `MixedEnvironment` | **Windows と macOS の混在環境で作業する**。OS 別のパス対応表の記入例は[環境設定](../using/preferences.ja.md)を参照してください。 |
 | `TvpBinaryPath` | **TVPaint実行ファイルのパス** |
 | `CspBinaryPath` | **Clip Studio実行ファイルのパス** |
 | `OpenToonzBinaryPath` | **OpenToonz実行ファイルのパス** |

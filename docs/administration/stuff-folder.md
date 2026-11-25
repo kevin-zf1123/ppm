@@ -69,6 +69,7 @@ XdtsViewerBinaryPath=
 | Key | Item in Preferences |
 |---|---|
 | `LanguageCode` | **Language**. Write the `ja` part of the translation file `PPM_ja.qm`. Leave it empty for English. |
+| `MixedEnvironment` | **Work in a mixed Windows / macOS environment**. See [Preferences](../using/preferences.md) for the per-OS mapping tables. |
 | `TvpBinaryPath` | **TVPaint executable path** |
 | `CspBinaryPath` | **Clip Studio executable path** |
 | `OpenToonzBinaryPath` | **OpenToonz executable path** |

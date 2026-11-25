@@ -123,6 +123,8 @@ Add `-DPPM_BUILD_TESTS=ON` to the configure command, build, and run:
 ctest --test-dir build -C Release -R '^ppm_(configuration|sceneinfotag|confirmation|sharedprojectcompatibility|macos_operations)_tests$' --output-on-failure
 ```
 
+The shared-project suite (`ppm_sharedprojectcompatibility_tests`) checks settings precedence across restarts, path mapping and project saves, Japanese filename matching, and copy, rewind and undo operations. It creates a project in the system temporary directory by default. To exercise a mounted share, set the `PPM_TEST_VOLUME` environment variable to an existing writable directory on that share before running CTest. The suite creates its own temporary subdirectory there and removes it on completion.
+
 GitHub Actions builds PPM with Qt 6.12 on Windows x64 and macOS arm64. Both platforms test configuration lookup, Stuff paths, per-user settings, scene-tag destruction, and confirming or canceling forward and rewind actions. The macOS tests also open documents in a test application, check OpenToonz argument delivery, and exercise ZIP creation and undo.
 
 ### Downloading CI application packages
