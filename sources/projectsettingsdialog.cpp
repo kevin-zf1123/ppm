@@ -100,13 +100,7 @@ void showProjectPath(Field* field, const QString& stored) {
 
 QString editedProjectPath(QWidget* parent, const QString& original,
                           const QString& input) {
-  if (input == mappings().toLocal(original)) return original;
-  if (mappings().rows.isEmpty() || !PathMappings::isAbsolute(input))
-    return input;
-  bool storedForm;
-  mappings().toLocal(input, &storedForm);
-  QStringList choices = mappings().storedCandidates(input);
-  if (storedForm && !choices.contains(input)) choices.prepend(input);
+  const QStringList choices = mappings().storageOptions(original, input);
   if (choices.size() == 1) return choices.first();
   if (!choices.isEmpty()) {
     bool ok;

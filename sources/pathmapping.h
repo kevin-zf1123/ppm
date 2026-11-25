@@ -16,7 +16,10 @@ public:
   static bool isAbsolute(const QString& path);
   QString toLocal(const QString& stored, bool* matched = nullptr) const;
   QString filesystemPath(const QString& stored) const;
-  QStringList storedCandidates(const QString& local) const;
+  // One option can be saved directly. Several require a choice; none means
+  // the editor must confirm saving an unmapped absolute path.
+  QStringList storageOptions(const QString& original,
+                             const QString& input) const;
   bool accepts(const PathMapping& row) const;
   static PathMappings read(QSettings& ini);
   void write(QSettings& ini) const;

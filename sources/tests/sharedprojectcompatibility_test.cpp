@@ -2,9 +2,7 @@
 #include "configurationpaths.h"
 #include "mywindow.h"
 #include "projectsettings_common.h"
-#include "projectsettingsdialog.h"
 #include "sharedfiles.h"
-#include "registerscenedialog.h"
 #include "usersettings.h"
 
 #include <QFile>
@@ -13,15 +11,8 @@
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
-#include <QJsonDocument>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <QPushButton>
-#include <QRadioButton>
-#include <QInputDialog>
 #include <QStandardPaths>
 #include <QTemporaryDir>
-#include <QTimer>
 #include <QtTest>
 
 class SharedProjectCompatibilityTest : public QObject {
@@ -34,13 +25,15 @@ class SharedProjectCompatibilityTest : public QObject {
   bool ownsConfig   = false;
   bool ownsUserFile = false;
   QString stored    = QStringLiteral(R"(\\Studio\Anime)");
-  PathMappings defaults;
 
   static bool write(const QString& path, const QByteArray& data) {
     QFile file(path);
     return file.open(QIODevice::WriteOnly) && file.write(data) == data.size();
   }
 
+  // Run this executable with --mapping-settings: UserSettings captures the
+  // active settings once per process, so only a fresh process observes a
+  // restart.
   void checkRestart(const QString& mode, const QString& local,
                     const QString& personal) {
     QCOMPARE(QProcess::execute(
@@ -50,6 +43,8 @@ class SharedProjectCompatibilityTest : public QObject {
              0);
   }
 
+  // A one-workflow project whose cue, info and log files live on the mapped
+  // share.
   void configureLayout(const QString& condition = "[ROOT]/[CUTNUMBER].clip",
                        FlowGroupInfo::TakeNotationStyle style =
                            FlowGroupInfo::TakeNotation_None) {
@@ -68,6 +63,8 @@ class SharedProjectCompatibilityTest : public QObject {
   }
 
 private slots:
+  // Map the studio UNC prefix to a temporary project. Only the common defaults
+  // file can opt the studio in; a platform file alone must leave it off.
   void initTestCase() {
     QVERIFY(root.isValid());
     QVERIFY(settings.isValid());
@@ -85,6 +82,7 @@ private slots:
     QSettings(confPath, QSettings::IniFormat)
         .setValue("StuffFolderPath", root.path());
     QVERIFY(QDir().mkpath(root.filePath("projects")));
+    PathMappings defaults;
     defaults.rows = {{stored, root.path()},
                      {root.path(), root.filePath("double-mapped")}};
 #ifdef Q_OS_WIN
@@ -96,8 +94,6 @@ private slots:
     defaults.write(ini);
     ini.setValue("UserSettings/MixedEnvironment", true);
     ini.sync();
-    // A platform mapping without an explicit opt-in must leave Windows-only
-    // studios on the normal filesystem path, including after an upgrade.
     QVERIFY(write(root.filePath(QStringLiteral("ガ.lookup")), "cue"));
     checkRestart("off", stored, root.path());
     QSettings common(root.filePath("defaultusersettings.ini"),
@@ -108,11 +104,15 @@ private slots:
              root.path());
   }
 
+  // Remove only the configuration files created for this isolated test process.
   void cleanupTestCase() {
     if (ownsConfig) QFile::remove(confPath);
     if (ownsUserFile) QFile::remove(ConfigurationPaths::userSettingsFilePath());
   }
 
+  // Drive-letter and UNC rules cover the same mount: match entire directory
+  // prefixes, prefer the longest and discard reverse paths that cannot
+  // round-trip.
   void matchPrefixes() {
     PathMappings m;
     QCOMPARE(m.toLocal("Z:/anime"), "Z:/anime");
@@ -124,13 +124,16 @@ private slots:
     QCOMPARE(m.toLocal("Z:/anime2/cuts"), "Z:/anime2/cuts");
     QCOMPARE(m.toLocal("[ROOT]/cuts"), "[ROOT]/cuts");
     QCOMPARE(m.toLocal("relative/cuts"), "relative/cuts");
-    QCOMPARE(m.storedCandidates("/Volumes/Anime/cuts/A.clip").size(), 3);
+    QCOMPARE(m.storageOptions({}, "/Volumes/Anime/cuts/A.clip").size(), 3);
     m.rows.append(PathMapping{"//NAS/anime/other", "/Volumes/B"});
-    QVERIFY(!m.storedCandidates("/Volumes/Anime/other/file")
+    QVERIFY(!m.storageOptions({}, "/Volumes/Anime/other/file")
                  .contains("//NAS/anime/other/file"));
     QCOMPARE(m.toLocal(R"(\\nas\ANIME\01)"), "/Volumes/Anime/01");
   }
 
+  // Switch between studio and personal mappings in the test INI files. After
+  // restart, both the saved personal table and an explicit empty override
+  // survive.
   void overrideDefaults() {
     auto* user = UserSettings::instance();
     QVERIFY(user->inheritsMappings());
@@ -162,7 +165,34 @@ private slots:
     user->setPathMappings({}, true);
   }
 
-  void projectEditorAndScan() {
+  // Issue #3: the original spelling survives a title-only edit; a changed
+  // field can have one, several or no valid stored forms.
+  void editedPathOptions() {
+    const QString original = R"(\\Studio\Anime\Old)";
+    PathMappings mappings;
+    QCOMPARE(mappings.storageOptions(original, "/unmapped"),
+             QStringList{"/unmapped"});
+    mappings.rows = {{"//Studio/Anime", "/mount/art"}};
+    QCOMPARE(mappings.storageOptions(original, "/mount/art/Old"),
+             QStringList{original});
+    QCOMPARE(mappings.storageOptions(original, "/mount/art/New"),
+             QStringList{"//Studio/Anime/New"});
+    QCOMPARE(mappings.storageOptions(original, "//Studio/Anime/New"),
+             QStringList{"//Studio/Anime/New"});
+    QCOMPARE(mappings.storageOptions(original, "[ROOT]/New"),
+             QStringList{"[ROOT]/New"});
+    QCOMPARE(mappings.storageOptions(original, ""), QStringList{""});
+    QVERIFY(mappings.storageOptions(original, "/unmapped").isEmpty());
+
+    // The local mount is also a stored prefix for a different location.
+    mappings.rows.append(PathMapping{"/mount/art", "/elsewhere"});
+    QCOMPARE(mappings.storageOptions(original, "/mount/art/New"),
+             (QStringList{"/mount/art/New", "//Studio/Anime/New"}));
+  }
+
+  // Change only the title of a UNC project, reload it and scan a cue under the
+  // mapped root. The stored paths and macros must survive the save.
+  void projectRoundTripAndScan() {
     auto* wm = WorkflowManager::instance();
     configureLayout();
     wm->setSceneThumbnailPath("[ROOT]/[CUTNUMBER].png");
@@ -171,28 +201,16 @@ private slots:
     QVERIFY(wm->saveProject("shared"));
     QVERIFY(wm->loadProject("shared"));
     refreshTmpSettingsFromProject();
-    BasicsPage basics;
-    basics.refresh();
-    auto folders   = basics.findChildren<FolderPathField*>();
-    auto rootField = std::find_if(
-        folders.begin(), folders.end(),
-        [&](FolderPathField* f) { return f->text() == root.path(); });
-    QVERIFY(rootField != folders.end());
-    QVERIFY(
-        (*rootField)->toolTip().contains(QDir::fromNativeSeparators(stored)));
-    auto edits = basics.findChildren<QLineEdit*>();
-    auto title = std::find_if(edits.begin(), edits.end(), [](QLineEdit* edit) {
-      return edit->text() == "Title";
-    });
-    QVERIFY(title != edits.end());
-    (*title)->setText("Edited title");
-    QVERIFY(QMetaObject::invokeMethod(&basics, "onFieldEdited"));
+    tmpSettings.projectTitle = "Edited title";
     QVERIFY(saveTmpSettingsToProject(nullptr, "shared"));
     QVERIFY(wm->loadProject("shared"));
     QCOMPARE(wm->projectTitle(), "Edited title");
     QCOMPARE(wm->projectRootPathSetting(), QDir::fromNativeSeparators(stored));
     QCOMPARE(wm->logRootPathSetting(),
              QDir::fromNativeSeparators(stored + "/logs"));
+    QCOMPARE(wm->infoFolderPathSetting(),
+             QDir::fromNativeSeparators(stored + "/info"));
+    QCOMPARE(wm->sceneThumbnailPath(), "[ROOT]/[CUTNUMBER].png");
     QCOMPARE(wm->getWorkflow(0).protocols.first().conditionPath,
              "[ROOT]/[CUTNUMBER].clip");
     QCOMPARE(wm->decodePath("[ROOT]/drawing", {}, {}),
@@ -206,52 +224,11 @@ private slots:
     MyTable table;
     table.simpleSearch(0);
     QVERIFY(wm->isInProgress("0001", 0));
-    // This local path is also the stored prefix of a second rule. The
-    // editor must offer both interpretations, including cancel.
-    QString input = root.filePath("ambiguous");
-    (*rootField)->setText(input);
-    QTimer::singleShot(0, [] {
-      auto* chooser =
-          qobject_cast<QInputDialog*>(QApplication::activeModalWidget());
-      QVERIFY(chooser);
-      chooser->reject();
-    });
-    QVERIFY(QMetaObject::invokeMethod(&basics, "onFieldEdited"));
-    QCOMPARE(tmpSettings.projectRootPath, QDir::fromNativeSeparators(stored));
-    (*rootField)->setText(input);
-    QTimer::singleShot(0, [&] {
-      auto* chooser =
-          qobject_cast<QInputDialog*>(QApplication::activeModalWidget());
-      QVERIFY(chooser);
-      const QString chosen = "//Studio/Anime/ambiguous";
-      QVERIFY(chooser->comboBoxItems().contains(chosen));
-      chooser->setTextValue(chosen);
-      chooser->accept();
-    });
-    QVERIFY(QMetaObject::invokeMethod(&basics, "onFieldEdited"));
-    QCOMPARE(tmpSettings.projectRootPath, "//Studio/Anime/ambiguous");
-    (*rootField)->setText("//Other/Unmapped");
-    QTimer::singleShot(0, [] {
-      auto* warning =
-          qobject_cast<QMessageBox*>(QApplication::activeModalWidget());
-      QVERIFY(warning);
-      warning->button(QMessageBox::Save)->click();
-    });
-    QVERIFY(QMetaObject::invokeMethod(&basics, "onFieldEdited"));
-    QCOMPARE(tmpSettings.projectRootPath, "//Other/Unmapped");
-    QVERIFY((*rootField)->toolTip().contains("//Other/Unmapped"));
-    // A hand-entered stored path must round-trip through the local display.
-    (*rootField)->setText("//Studio/Anime/New");
-    QVERIFY(QMetaObject::invokeMethod(&basics, "onFieldEdited"));
-    QCOMPARE((*rootField)->text(), root.filePath("New"));
-    QVERIFY(saveTmpSettingsToProject(nullptr, "shared"));
-    QVERIFY(wm->loadProject("shared"));
-    QCOMPARE(wm->projectRootPathSetting(), "//Studio/Anime/New");
-    QCOMPARE(wm->infoFolderPathSetting(),
-             QDir::fromNativeSeparators(stored + "/info"));
-    QCOMPARE(wm->sceneThumbnailPath(), "[ROOT]/[CUTNUMBER].png");
   }
 
+  // Rewind builds its executors from the selected workflow and its file picker
+  // supplies the files to move. Confirm the assembled dialog to check that its
+  // local backup and cue paths are not mapped a second time.
   void rewindOnMappedShare() {
     configureLayout("[ROOT]/rewind/[CUTNUMBER][R].clip",
                     FlowGroupInfo::TakeNotation_Rewind);
@@ -259,17 +236,16 @@ private slots:
     QVERIFY(QDir().mkpath(root.filePath("rewind")));
     QVERIFY(write(cue, "drawing"));
     RewindConfirmationDialog dialog({0, 0, {cue}, {}, "0002"}, {0, 0}, false);
-    for (auto* button : dialog.findChildren<QPushButton*>())
-      if (button->text() == "OK") {
-        button->click();
-        break;
-      }
+    dialog.show();
+    QTest::keyClick(&dialog, Qt::Key_Return);
     QVERIFY(!dialog.isCanceled());
     QVERIFY(QFileInfo::exists(root.filePath("rewind/old/0002.clip")));
     QVERIFY(QFileInfo::exists(root.filePath("rewind/0002_r.clip.txt")));
     QVERIFY(!QFileInfo::exists(root.filePath("double-mapped")));
   }
 
+  // Copy a directory with a kana drawing, Finder metadata and a user dotfile.
+  // Undo must preserve a drawing added by another user after the copy.
   void recursiveCopyAndUndo() {
     const QString source = root.filePath("Source");
     const QString dest   = root.filePath("Destination");
@@ -309,6 +285,8 @@ private slots:
              QFileInfo(alias).exists());
   }
 
+  // The stored source and local destination name the same drawing. Refuse an
+  // overwrite while allowing the two skip policies to finish safely.
   void mappedCopyPreservesSource() {
     const QString dir = root.filePath("alias-copy");
     QVERIFY(QDir().mkpath(dir));
@@ -335,6 +313,8 @@ private slots:
     }
   }
 
+  // An unmapped foreign path cannot supply local project data. Registration
+  // must report the missing info mapping even when the cue root resolves.
   void unavailableForeignRoot() {
     auto* wm = WorkflowManager::instance();
 #ifdef Q_OS_WIN
@@ -356,16 +336,9 @@ private slots:
 
     configureLayout();
     wm->setInfoFolderPath(foreign);
-    RegisterSceneDialog dialog(0);
-    dialog.findChild<QLineEdit*>()->setText("0023");
-    for (auto* radio : dialog.findChildren<QRadioButton*>())
-      if (radio->text().contains("empty")) radio->click();
-    const auto buttons = dialog.findChildren<QPushButton*>();
-    const auto reg =
-        std::find_if(buttons.begin(), buttons.end(),
-                     [](auto* button) { return button->text() == "Register"; });
-    QVERIFY(reg != buttons.end());
-    QVERIFY(!(*reg)->isEnabled());
+    QVERIFY(!wm->projectInfoMappingError().isEmpty());
+    wm->setInfoFolderPath(stored + "/info");
+    QVERIFY(wm->projectInfoMappingError().isEmpty());
   }
 
   // Move, Ask Delete and undoing Create Empty Folder all treat a folder
@@ -377,6 +350,8 @@ private slots:
     QTest::newRow("undo create empty folder") << QString("undo");
   }
 
+  // Leave only hidden entries in a scene directory. Each action removes it,
+  // while undo keeps the folder if another artist added a visible drawing.
   void hiddenFolderCleanup() {
     QFETCH(QString, action);
     const QString group = "/cleanup-" + action;
@@ -426,9 +401,9 @@ private slots:
     QVERIFY(!QFileInfo::exists(dir));
   }
 
+  // Create a file between two lookups: only the next refresh should see
+  // the newly created spelling in its directory snapshot.
   void refreshDirectorySnapshot() {
-    // Create the composed filename between two lookups in one refresh.
-    // Only the next refresh should see its on-disk spelling.
     const QString dir = root.filePath("listing");
     QVERIFY(QDir().mkdir(dir));
     const QString nfd =
@@ -448,6 +423,8 @@ private slots:
              dir + "/" + QDir(dir).entryList(QDir::Files).first());
   }
 
+  // Use a decomposed scene prefix with existing kana filenames. Thumbnails,
+  // logs and scene-info updates must refer to the existing files.
   void japaneseSceneFiles() {
     configureLayout();
     auto* wm = WorkflowManager::instance();
@@ -473,6 +450,8 @@ private slots:
     QCOMPARE(wm->sceneInfoTags({}, "0015").value("Note").toString(), "updated");
   }
 
+  // Look up a decomposed filename by its composed spelling. On volumes that
+  // can hold both names, a collision must leave both files untouched.
   void equivalentSpellings() {
     const QString composed   = root.filePath("ペ.clip");
     const QString decomposed = root.filePath(

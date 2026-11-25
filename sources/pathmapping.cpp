@@ -77,18 +77,23 @@ QString PathMappings::filesystemPath(const QString& stored) const {
   return path;
 }
 
-QStringList PathMappings::storedCandidates(const QString& local) const {
-  QStringList candidates;
-  if (isAbsolute(local)) {
-    for (const auto& row : rows) {
-      QString candidate;
-      if (substitute(local, row.local, row.stored, candidate) &&
-          equivalent(prefix(toLocal(candidate)), prefix(local)) &&
-          !candidates.contains(candidate))
-        candidates.append(candidate);
-    }
+QStringList PathMappings::storageOptions(const QString& original,
+                                         const QString& input) const {
+  if (input == toLocal(original)) return {original};
+  if (rows.isEmpty() || !isAbsolute(input)) return {input};
+
+  QStringList choices;
+  for (const auto& row : rows) {
+    QString candidate;
+    if (substitute(input, row.local, row.stored, candidate) &&
+        equivalent(prefix(toLocal(candidate)), prefix(input)) &&
+        !choices.contains(candidate))
+      choices.append(candidate);
   }
-  return candidates;
+  bool storedForm;
+  toLocal(input, &storedForm);
+  if (storedForm && !choices.contains(input)) choices.prepend(input);
+  return choices;
 }
 
 bool PathMappings::accepts(const PathMapping& row) const {
