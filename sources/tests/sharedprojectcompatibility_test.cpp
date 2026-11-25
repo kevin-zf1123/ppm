@@ -94,13 +94,16 @@ private slots:
 #endif
     QSettings ini(root.filePath(name), QSettings::IniFormat);
     defaults.write(ini);
+    ini.setValue("UserSettings/MixedEnvironment", true);
     ini.sync();
     // A platform mapping without an explicit opt-in must leave Windows-only
     // studios on the normal filesystem path, including after an upgrade.
     QVERIFY(write(root.filePath(QStringLiteral("ガ.lookup")), "cue"));
     checkRestart("off", stored, root.path());
-    ini.setValue("UserSettings/MixedEnvironment", true);
-    ini.sync();
+    QSettings common(root.filePath("defaultusersettings.ini"),
+                     QSettings::IniFormat);
+    common.setValue("UserSettings/MixedEnvironment", true);
+    common.sync();
     QCOMPARE(UserSettings::instance()->pathMappings().toLocal(stored),
              root.path());
   }

@@ -54,6 +54,8 @@ UserSettings::UserSettings()
       m_languageCode    = defaultSettings.value("LanguageCode").toString();
       languageSpecified = true;
     }
+    m_configuredMixed =
+        defaultSettings.value("MixedEnvironment", false).toBool();
     defaultSettings.endGroup();
 #ifdef Q_OS_WIN
     const QString defaultsName = "/defaultusersettings_windows.ini";
@@ -63,8 +65,6 @@ UserSettings::UserSettings()
     QSettings platformDefaults(m_stuffFolderPath + defaultsName,
                                QSettings::IniFormat);
     m_defaultMappings = PathMappings::read(platformDefaults);
-    m_configuredMixed =
-        platformDefaults.value("UserSettings/MixedEnvironment", false).toBool();
   }
 
   m_personalMappings = m_defaultMappings;
