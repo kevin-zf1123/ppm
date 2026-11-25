@@ -5364,8 +5364,12 @@ The change is applied the next time the application is started.</source>
         <translation>両方の欄に絶対パスを入力してください。保存パスの先頭部分は重複して登録できません。</translation>
     </message>
     <message>
-        <source>Enable this when Windows and macOS share production files. PPM matches equivalent Unicode file names and applies the shared folder mappings after restart.</source>
-        <translation>Windows と macOS で制作ファイルを共有するときにオンにします。再起動後、同じ文字の合成・分解の違いを考慮してファイル名を照合し、共有フォルダのパス対応表を適用します。</translation>
+        <source>Turn this on when Windows and macOS use the same shared folders.
+PPM then matches file names written with composed or decomposed characters, such as Japanese kana, and converts paths using the shared folder mappings.
+Changes take effect after restarting PPM.</source>
+        <translation>Windows と macOS で同じ共有フォルダを使うときにオンにします。
+オンにすると、OS によって異なるファイル名の文字の表し方（濁点などの合成・分解）の違いを吸収し、「共有フォルダのパス対応表」でパスを変換します。
+変更は PPM の再起動後に反映されます。</translation>
     </message>
     <message>
         <source>Work in a mixed Windows / macOS environment</source>

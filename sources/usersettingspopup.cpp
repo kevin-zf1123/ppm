@@ -6,6 +6,7 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QCheckBox>
+#include <QGroupBox>
 #include <QDialogButtonBox>
 #include <QComboBox>
 #include <QLocale>
@@ -149,22 +150,26 @@ UserSettingsPopup::UserSettingsPopup(QWidget* parent, Qt::WindowFlags f)
       uiLay->addWidget(userNameLabel, 7, 0, Qt::AlignRight | Qt::AlignVCenter);
       uiLay->addWidget(m_userName, 7, 1);
     }
-    auto* mappingsButton =
-        new QPushButton(tr("Shared folder mappings..."), this);
     auto* mixed =
-        new QCheckBox(tr("Work in a mixed Windows / macOS environment"), this);
+        new QGroupBox(tr("Work in a mixed Windows / macOS environment"), this);
+    auto* mappingsButton =
+        new QPushButton(tr("Shared folder mappings..."), mixed);
+    auto* mixedLayout = new QVBoxLayout(mixed);
+    mixedLayout->addWidget(mappingsButton);
+    mixed->setCheckable(true);
     mixed->setToolTip(
-        tr("Enable this when Windows and macOS share production files. PPM "
-           "matches equivalent Unicode file names and applies the shared "
-           "folder mappings after restart."));
-    mixed->setChecked(UserSettings::instance()->configuredMixedEnvironment());
-    mappingsButton->setEnabled(mixed->isChecked());
-    connect(mixed, &QCheckBox::toggled, this, [mappingsButton](bool enabled) {
-      UserSettings::instance()->setMixedEnvironment(enabled);
-      mappingsButton->setEnabled(enabled);
+        tr("Turn this on when Windows and macOS use the same shared folders.\n"
+           "PPM then matches file names written with composed or decomposed "
+           "characters, "
+           "such as Japanese kana, and converts paths using the shared folder "
+           "mappings.\n"
+           "Changes take effect after restarting PPM."));
+    auto* settings = UserSettings::instance();
+    mixed->setChecked(settings->configuredMixedEnvironment());
+    connect(mixed, &QGroupBox::toggled, this, [settings](bool enabled) {
+      settings->setMixedEnvironment(enabled);
     });
-    uiLay->addWidget(mixed, 8, 1);
-    uiLay->addWidget(mappingsButton, 9, 1);
+    uiLay->addWidget(mixed, 8, 0, 1, 3);
     connect(mappingsButton, &QPushButton::clicked, this,
             &UserSettingsPopup::editMappings);
     mainLay->addLayout(uiLay);
